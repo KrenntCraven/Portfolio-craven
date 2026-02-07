@@ -1,3 +1,4 @@
+import type { Asset, EntryFieldTypes } from "contentful";
 import { createClient } from "contentful";
 
 const client = createClient({
@@ -5,8 +6,27 @@ const client = createClient({
   environment: process.env.NEXT_PUBLIC_CONTENTFUL_ENVIRONMENT_ID || "craven",
   accessToken: process.env.NEXT_PUBLIC_CONTENTFUL_DELIVERY_TOKEN!,
 });
-const PROJECT_TYPE =
-  process.env.NEXT_PUBLIC_CONTENTFUL_PROJECT_TYPE_ID || "featuredProjects";
+
+const PROJECT_TYPE = "featuredProjects" as const;
+
+// Define proper Entry Skeleton Types
+interface ProjectEntryFields {
+  title: EntryFieldTypes.Text;
+  slug: EntryFieldTypes.Text;
+  headline?: EntryFieldTypes.Text;
+  heroImage?: EntryFieldTypes.AssetLink;
+  coverPage?: EntryFieldTypes.AssetLink;
+  projectType?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+  keyFeatures?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+  role?: EntryFieldTypes.Text;
+  technologies?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+  order?: EntryFieldTypes.Integer;
+}
+
+interface ProjectEntrySkeleton {
+  contentTypeId: typeof PROJECT_TYPE;
+  fields: ProjectEntryFields;
+}
 
 export type Project = {
   id: string;
@@ -22,19 +42,13 @@ export type Project = {
   order?: number;
 };
 
-export async function getFeaturedProjects() {
-  const entries = await client.getEntries<{
-    title: string;
-    slug: string;
-    headline?: string;
-    heroImage?: { fields?: { file?: { url?: string } } };
-    coverPage?: { fields?: { file?: { url?: string } } };
-    projectType?: string[];
-    keyFeatures?: string[];
-    role?: string;
-    technologies?: string[];
-    order?: number;
-  }>({
+// Helper function to check if asset is resolved
+function isAsset(asset: any): asset is Asset {
+  return asset && "fields" in asset;
+}
+
+export async function getFeaturedProjects(): Promise<Project[]> {
+  const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
     order: ["fields.order"],
   });
@@ -45,12 +59,18 @@ export async function getFeaturedProjects() {
       title: item.fields.title ?? "Untitled",
       slug: item.fields.slug ?? "",
       headline: item.fields.headline,
-      imageUrl: item.fields.heroImage?.fields?.file?.url
-        ? `https:${item.fields.heroImage.fields.file.url}`
-        : undefined,
-      coverPageUrl: item.fields.coverPage?.fields?.file?.url
-        ? `https:${item.fields.coverPage.fields.file.url}`
-        : undefined,
+      imageUrl:
+        item.fields.heroImage &&
+        isAsset(item.fields.heroImage) &&
+        item.fields.heroImage.fields?.file?.url
+          ? `https:${item.fields.heroImage.fields.file.url}`
+          : undefined,
+      coverPageUrl:
+        item.fields.coverPage &&
+        isAsset(item.fields.coverPage) &&
+        item.fields.coverPage.fields?.file?.url
+          ? `https:${item.fields.coverPage.fields.file.url}`
+          : undefined,
       projectType: item.fields.projectType,
       keyFeatures: item.fields.keyFeatures,
       role: item.fields.role,
@@ -61,18 +81,7 @@ export async function getFeaturedProjects() {
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
-  const entries = await client.getEntries<{
-    title: string;
-    slug: string;
-    headline?: string;
-    heroImage?: { fields?: { file?: { url?: string } } };
-    coverPage?: { fields?: { file?: { url?: string } } };
-    projectType?: string[];
-    keyFeatures?: string[];
-    role?: string;
-    technologies?: string[];
-    order?: number;
-  }>({
+  const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
     "fields.slug": slug,
     limit: 1,
@@ -86,12 +95,18 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     title: item.fields.title ?? "Untitled",
     slug: item.fields.slug ?? "",
     headline: item.fields.headline,
-    imageUrl: item.fields.heroImage?.fields?.file?.url
-      ? `https:${item.fields.heroImage.fields.file.url}`
-      : undefined,
-    coverPageUrl: item.fields.coverPage?.fields?.file?.url
-      ? `https:${item.fields.coverPage.fields.file.url}`
-      : undefined,
+    imageUrl:
+      item.fields.heroImage &&
+      isAsset(item.fields.heroImage) &&
+      item.fields.heroImage.fields?.file?.url
+        ? `https:${item.fields.heroImage.fields.file.url}`
+        : undefined,
+    coverPageUrl:
+      item.fields.coverPage &&
+      isAsset(item.fields.coverPage) &&
+      item.fields.coverPage.fields?.file?.url
+        ? `https:${item.fields.coverPage.fields.file.url}`
+        : undefined,
     projectType: item.fields.projectType,
     keyFeatures: item.fields.keyFeatures,
     role: item.fields.role,
@@ -99,3 +114,5 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     order: item.fields.order,
   };
 }
+
+export default client;

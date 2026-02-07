@@ -14,7 +14,6 @@ const fadeUp = {
 export default function LandingPage() {
   return (
     <main className="relative overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[700px]">
-      {" "}
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -88,35 +87,35 @@ export default function LandingPage() {
 
           <div className="grid w-full max-w-xl grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-4">
             {socials.map((item) => (
-              <Button
-                as={motion.a}
+              <motion.div
                 key={item.label}
-                href={item.href}
-                {...(item.external && {
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                })}
-                startContent={
-                  <span className="text-neutral-900 text-sm sm:text-base">
-                    {item.icon}
-                  </span>
-                }
-                variant="bordered"
-                radius="lg"
-                fullWidth
                 whileHover={{
                   y: -2,
                   scale: 1.02,
-                  boxShadow: "0 18px 55px -26px rgba(0,0,0,0.55)",
-                  backgroundColor: "rgba(255,255,255,0.78)",
-                  borderColor: "rgba(0,0,0,0.25)",
                 }}
                 whileTap={{ scale: 0.97, y: 0 }}
                 transition={{ type: "spring", stiffness: 280, damping: 18 }}
-                className="inline-flex items-center justify-center gap-1.5 sm:gap-2 overflow-hidden rounded-lg sm:rounded-xl border border-black/15 bg-white/55 px-3 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-semibold text-neutral-900 shadow-[0_8px_30px_-14px_rgba(0,0,0,0.4)] sm:shadow-[0_10px_40px_-16px_rgba(0,0,0,0.45)] backdrop-blur-lg"
               >
-                {item.label}
-              </Button>
+                <Button
+                  as="a"
+                  href={item.href}
+                  {...(item.external && {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  })}
+                  startContent={
+                    <span className="text-neutral-900 text-sm sm:text-base">
+                      {item.icon}
+                    </span>
+                  }
+                  variant="bordered"
+                  radius="lg"
+                  fullWidth
+                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 overflow-hidden rounded-lg sm:rounded-xl border border-black/15 bg-white/55 px-3 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-semibold text-neutral-900 shadow-[0_8px_30px_-14px_rgba(0,0,0,0.4)] sm:shadow-[0_10px_40px_-16px_rgba(0,0,0,0.45)] backdrop-blur-lg hover:bg-white/80 hover:border-black/25 hover:shadow-[0_18px_55px_-26px_rgba(0,0,0,0.55)]"
+                >
+                  {item.label}
+                </Button>
+              </motion.div>
             ))}
           </div>
         </motion.div>

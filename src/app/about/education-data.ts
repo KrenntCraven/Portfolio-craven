@@ -1,4 +1,4 @@
-interface EducationItem {
+export interface EducationItem {
   title: string;
   institution: string;
   period: string;

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import type { JSX } from "react";
 import { educationItems } from "./education-data";
 
 interface EducationItem {
@@ -90,6 +91,7 @@ export const Education = (): JSX.Element => {
                           }}
                           className="flex items-start gap-3 leading-[2.2] sm:leading-loose lg:leading-loose"
                         >
+                          <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-neutral-500" />
                           <span className="text-justify hyphens-auto sm:hyphens-auto md:hyphens-auto lg:hyphens-none">
                             {foundLabel ? (
                               <>

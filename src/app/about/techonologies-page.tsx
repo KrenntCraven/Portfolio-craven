@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { motion, useInView } from "framer-motion";
 import gsap from "gsap";
+import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
 import { TechCategory, technologies } from "./technologies-data";
 
@@ -16,11 +17,6 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 15,
-    },
   },
 };
 

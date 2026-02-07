@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getProjectBySlug } from "../../backend/contentful_init";
+import { getProjectBySlug, type Project } from "../../backend/contentful_init";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
