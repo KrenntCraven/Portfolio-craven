@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { motion, useInView } from "framer-motion";
 import gsap from "gsap";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TechCategory, technologies } from "./technologies-data";
 
 const cardVariants = {
@@ -24,11 +24,18 @@ const cardVariants = {
   },
 };
 
-const categoryIcons: Record<string, JSX.Element> = {
-  "Frontend Development": <CodeBracketIcon className="h-6 w-6" />,
-  "Backend Development": <CircleStackIcon className="h-6 w-6" />,
-  "DevOps & Tools": <CommandLineIcon className="h-6 w-6" />,
-  "Other Skills": <CubeIcon className="h-6 w-6" />,
+const iconClassName =
+  "h-6 w-6 min-h-6 min-w-6 sm:h-6 sm:w-6 text-white block shrink-0";
+
+const renderIcon = (Icon: typeof CubeIcon): JSX.Element => (
+  <Icon className={iconClassName} width={24} height={24} aria-hidden="true" />
+);
+
+const categoryIcons: Record<string, () => JSX.Element> = {
+  Languages: () => renderIcon(CodeBracketIcon),
+  Backend: () => renderIcon(CircleStackIcon),
+  Frontend: () => renderIcon(CodeBracketIcon),
+  "Cloud & DevOps": () => renderIcon(CommandLineIcon),
 };
 
 export const Technologies = (): JSX.Element => {
@@ -36,6 +43,7 @@ export const Technologies = (): JSX.Element => {
   const cardsRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const isInView = useInView(cardsRef, { once: true, margin: "-100px" });
+  const [spinningIndex, setSpinningIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!glowRef.current) return;
@@ -124,12 +132,21 @@ export const Technologies = (): JSX.Element => {
               <div className="relative flex items-center gap-4 mb-6">
                 <motion.div
                   whileHover={{ rotate: 360 }}
+                  animate={
+                    spinningIndex === index ? { rotate: 360 } : { rotate: 0 }
+                  }
                   transition={{ duration: 0.6 }}
+                  onPointerDown={(event) => {
+                    if (event.pointerType !== "touch") return;
+                    setSpinningIndex(index);
+                    window.setTimeout(() => setSpinningIndex(null), 650);
+                  }}
                   className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-900 text-white shadow-lg shadow-neutral-500/30"
                 >
-                  {categoryIcons[category.title] || (
-                    <CubeIcon className="h-6 w-6" />
-                  )}
+                  {(
+                    categoryIcons[category.title] ||
+                    (() => renderIcon(CubeIcon))
+                  )()}
                 </motion.div>
                 <h2 className="text-2xl font-bold text-neutral-900">
                   {category.title}
@@ -150,7 +167,7 @@ export const Technologies = (): JSX.Element => {
                   >
                     <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500 group-hover/item:scale-125 transition-transform duration-200" />
 
-                    <span className="text-justify hyphens-none group-hover/item:text-neutral-900 transition-colors duration-200">
+                    <span className="text-left sm:text-justify hyphens-none group-hover/item:text-neutral-900 transition-colors duration-200">
                       {item}
                     </span>
                   </motion.li>

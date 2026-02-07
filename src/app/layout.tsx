@@ -12,8 +12,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Craven Portfolio",
+  title: "Krennt Craven - Portfolio",
   description: "Krennt Craven's Personal Portfolio Website",
+  icons: {
+    icon: "/Logo.svg",
+  },
 };
 
 export default function RootLayout({

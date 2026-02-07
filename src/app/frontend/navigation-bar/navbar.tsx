@@ -286,7 +286,7 @@ export default function NavigationBar() {
               <Link
                 href="/#contact"
                 onClick={() => setIsMenuOpen(false)}
-                className="relative block w-full overflow-hidden rounded-2xl border border-black/10 bg-black px-6 py-4 text-center text-lg text-white font-semibold shadow-lg shadow-black/20 transition-all duration-300 hover:bg-black/90"
+                className="relative block w-full overflow-hidden rounded-2xl border border-black/10 bg-[var(--color-neutral-900)] px-6 py-4 text-center text-lg text-white font-semibold shadow-lg shadow-black/20 transition-all duration-300 hover:bg-[var(--color-neutral-900)]/90"
               >
                 <motion.span
                   className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0"
