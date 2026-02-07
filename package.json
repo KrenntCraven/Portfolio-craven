@@ -9,8 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@heroui/button": "^2.2.30",
     "@heroui/react": "^2.8.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/themes": "^3.3.0",
     "contentful": "^11.10.3",
     "framer-motion": "^12.29.2",

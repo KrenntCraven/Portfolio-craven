@@ -2,6 +2,7 @@
 
 import { Button } from "@heroui/button";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { socials } from "./socials-link";
 
 const fadeUp = {
@@ -12,7 +13,7 @@ const fadeUp = {
 
 export default function LandingPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+    <main className="relative overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[700px]">
       {" "}
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
@@ -21,7 +22,7 @@ export default function LandingPage() {
         <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
       </div>
       <section className="relative mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 pb-16 pt-12 sm:gap-10 sm:px-6 sm:pb-20 sm:pt-16 lg:flex-row lg:items-center lg:gap-16 lg:px-8 lg:pt-24">
-        {/* Avatar Card - Mobile First (appears first on mobile) */}
+        {/* Avatar - Mobile First (appears first on mobile) */}
         <motion.div
           {...fadeUp}
           initial="initial"
@@ -29,17 +30,24 @@ export default function LandingPage() {
           transition={{ delay: 0.1, duration: 0.7 }}
           className="w-full max-w-sm lg:order-2 lg:flex-1"
         >
-          <div className="relative mx-auto rounded-[28px] sm:rounded-[32px] border border-white/35 bg-white/40 p-5 sm:p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.5)] sm:shadow-[0_25px_80px_-35px_rgba(0,0,0,0.55)] backdrop-blur-xl">
-            <div className="absolute inset-0 rounded-[28px] sm:rounded-[32px] bg-[linear-gradient(120deg,rgba(255,255,255,0.12),transparent_45%),radial-gradient(circle_at_30%_20%,rgba(0,0,0,0.08),transparent_36%)]" />
-            <div className="relative flex flex-col items-center gap-4 sm:gap-5">
-              <div className="relative flex h-36 w-36 sm:h-44 sm:w-44 items-center justify-center overflow-hidden rounded-full border border-white/50 bg-gradient-to-br from-white via-[#f7f7f7] to-black/8 text-base sm:text-lg font-semibold text-neutral-800 shadow-inner ring-1 ring-white/50 shadow-[0_15px_50px_-30px_rgba(0,0,0,0.6)] sm:shadow-[0_20px_60px_-35px_rgba(0,0,0,0.65)]">
-                Avatar
+          <div className="relative flex flex-col items-center gap-4 sm:gap-5">
+            {/* Avatar Image */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="relative h-40 w-40 xs:h-48 xs:w-48 sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-72 lg:w-72"
+            >
+              <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white/50 shadow-2xl">
+                <Image
+                  src="/path-to-your-avatar.jpg"
+                  alt="Avatar"
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
-              <div className="rounded-xl sm:rounded-2xl border border-black/10 bg-white/80 px-4 py-3 sm:px-5 sm:py-4 text-center text-xs sm:text-sm text-neutral-700 shadow-sm">
-                Available for web, mobile, and platform work. I care about
-                clarity, polish, and shipping on schedule.
-              </div>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
 
@@ -54,9 +62,12 @@ export default function LandingPage() {
             initial={{ opacity: 0, x: -28 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-3 py-1.5 sm:px-4 sm:py-2 text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.2em] sm:tracking-[0.24em] text-neutral-700"
+            className="inline-flex items-center gap-3 rounded-full bg-black/5 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-[0.26em] sm:tracking-[0.28em] text-neutral-700"
           >
-            <span className="h-1 w-1 rounded-full bg-neutral-800" aria-hidden />
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-neutral-800"
+              aria-hidden
+            />
             <motion.span
               initial={{ maxWidth: "0ch" }}
               animate={{ maxWidth: "40ch" }}

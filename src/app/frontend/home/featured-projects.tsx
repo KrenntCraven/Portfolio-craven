@@ -2,10 +2,17 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
+import { usePageTransition } from "../page-transition/page-transition";
 
 // Define the Project type
-type Project = { id: string; title: string; imageUrl?: string; slug: string };
+type Project = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  slug: string;
+  coverPageUrl?: string;
+};
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -25,9 +32,44 @@ export default function FeaturedProjectsClient({
 }: {
   projects: Project[];
 }) {
+  const [clickedProject, setClickedProject] = useState<string | null>(null);
+  const { startTransition } = usePageTransition();
+
+  const handleProjectClick = (e: React.MouseEvent, slug: string) => {
+    e.preventDefault();
+    setClickedProject(slug);
+    startTransition(`/projects/${slug}`);
+  };
+
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white text-neutral-900">
-      <section className="relative mx-auto flex max-w-xl flex-col items-center gap-8 px-4 pb-16 pt-16 sm:gap-10 sm:px-6 sm:pb-20 sm:pt-20 lg:max-w-6xl lg:gap-14 lg:px-8 lg:pb-24 lg:pt-28 xl:max-w-7xl">
+    <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pb-24">
+      {/* Background decorations */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
+        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
+        <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
+      </div>
+
+      <section className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8 lg:pb-28 lg:pt-28">
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-4 text-center text-4xl font-semibold text-neutral-900 sm:text-5xl lg:mb-6"
+        >
+          Featured Projects
+        </motion.h1>
+
+        <motion.h2
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-12 text-center text-base text-neutral-600 sm:text-lg lg:mb-16 max-w-3xl mx-auto lg:whitespace-nowrap"
+        >
+          A collection of projects I&apos;ve built, focusing on real-world
+          problems and scalable solutions
+        </motion.h2>
+
         <motion.div
           {...fadeUp}
           initial="initial"
@@ -39,62 +81,84 @@ export default function FeaturedProjectsClient({
             {...gridStagger}
             initial="initial"
             animate="animate"
-            className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 lg:gap-10"
+            className="relative grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10"
           >
             {projects.map((project) => (
               <motion.article
                 key={project.id}
                 variants={fadeUp}
                 transition={{ duration: 0.55, ease: "easeOut" }}
-                whileHover={{ y: -6 }}
-                whileTap={{ scale: 0.99 }}
-                className="group relative mx-auto w-full max-w-lg rounded-[24px] border border-black/10 bg-white/60 p-4 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.55] backdrop-blur-xl transition-shadow hover:shadow-[0_30px_90px_-50px_rgba(0,0,0,0.65)] sm:rounded-[28px] sm:p-6"
+                whileHover={{ y: -8, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={(e) => handleProjectClick(e, project.slug)}
+                className="group relative overflow-hidden rounded-3xl border border-neutral-200/60 bg-white/70 shadow-xl backdrop-blur-md transition-shadow duration-300 hover:shadow-2xl cursor-pointer"
               >
-                {/* subtle surface */}
-                <div className="pointer-events-none absolute inset-0 rounded-[24px] bg-[linear-gradient(120deg,rgba(255,255,255,0.55),transparent_48%),radial-gradient(circle_at_28%_18%,rgba(0,0,0,0.06),transparent_42%)] opacity-90 transition-opacity group-hover:opacity-100 sm:rounded-[28px]" />
+                {/* Card shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
 
-                <div className="relative flex flex-col items-center gap-4 sm:gap-6">
-                  <div className="relative w-full overflow-hidden rounded-xl border border-white/70 bg-gradient-to-br from-white via-[#f7f7f7] to-black/10 shadow-inner ring-1 ring-black/5 sm:rounded-2xl">
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="relative block aspect-square w-full"
-                    >
-                      {project.imageUrl ? (
+                <div className="relative">
+                  {/* Project Image */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
+                    <div className="relative h-full w-full">
+                      {project.coverPageUrl ? (
                         <>
                           <Image
-                            src={project.imageUrl}
+                            src={`${project.coverPageUrl}?fm=webp&fit=fill`}
                             alt={project.title}
                             fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                            quality={85}
+                            loading="lazy"
                           />
-                          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.22),transparent_55%)] opacity-70" />
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60" />
                         </>
                       ) : (
-                        <div className="absolute inset-0 grid place-items-center">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-black/10 bg-white/70 text-lg font-semibold text-neutral-700 shadow-sm sm:h-14 sm:w-14 sm:rounded-2xl sm:text-xl">
+                        <div className="flex h-full items-center justify-center">
+                          <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-neutral-200 bg-white text-3xl font-bold text-neutral-700 shadow-lg">
                             {firstTextCapitalize(
                               project.title?.trim()?.[0] ?? "P",
                             )}
                           </div>
                         </div>
                       )}
-                    </Link>
+                    </div>
                   </div>
 
-                  <div className="w-full rounded-xl border border-black/10 bg-white/80 px-4 py-3 text-center shadow-sm transition-colors group-hover:bg-white sm:rounded-2xl sm:px-5 sm:py-4">
-                    <div className="line-clamp-2 text-sm font-semibold tracking-tight text-neutral-900 sm:text-base">
+                  {/* Project Info */}
+                  <div className="relative p-6 sm:p-8">
+                    <h3 className="mb-2 line-clamp-2 text-xl font-semibold text-neutral-900 sm:text-2xl">
                       {firstTextCapitalize(project.title)}
-                    </div>
-                    <div className="mt-1 text-[0.65rem] text-neutral-600 sm:text-xs">
+                    </h3>
+                    <p className="mb-4 text-sm text-neutral-600 sm:text-base">
                       Featured project
-                    </div>
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="mt-2.5 inline-flex items-center justify-center rounded-full border border-black/10 px-3.5 py-1.5 text-[0.65rem] font-semibold text-neutral-900 transition-colors hover:bg-black hover:text-white sm:mt-3 sm:px-4 sm:py-2 sm:text-xs"
+                    </p>
+                    <button
+                      onClick={(e) => handleProjectClick(e, project.slug)}
+                      className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-neutral-800 hover:shadow-lg sm:px-6 sm:py-3 sm:text-base overflow-hidden relative"
                     >
-                      View project
-                    </Link>
+                      View Project
+                      <motion.svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        animate={
+                          clickedProject === project.slug
+                            ? { x: 100, opacity: 0 }
+                            : { x: 0, opacity: 1 }
+                        }
+                        whileHover={{ x: 4 }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
+                      </motion.svg>
+                    </button>
                   </div>
                 </div>
               </motion.article>
