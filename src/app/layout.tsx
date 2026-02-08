@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen`}
       >
-        <PageTransitionProvider>
+        <PageTransitionProvider disableOnPaths={["/projects"]}>
           <NavigationBar />
           <main className="flex-1">{children}</main>
           <Footer />

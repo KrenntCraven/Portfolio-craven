@@ -19,6 +19,10 @@ export default function Certification() {
     const track = trackRef.current;
     if (!section || !viewport || !track) return;
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchDragging = false;
+
     const updateBounds = () => {
       const max = Math.max(0, track.scrollWidth - viewport.clientWidth);
       setMaxOffset(max);
@@ -51,16 +55,60 @@ export default function Certification() {
       x.set(clamped);
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isTouchDragging = true;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isTouchDragging || e.touches.length !== 1) return;
+
+      const sectionRect = section.getBoundingClientRect();
+      const isSectionInView =
+        sectionRect.top < window.innerHeight * 0.7 &&
+        sectionRect.bottom > window.innerHeight * 0.3;
+      if (!isSectionInView || maxOffset <= 0) return;
+
+      const deltaX = e.touches[0].clientX - touchStartX;
+      const deltaY = e.touches[0].clientY - touchStartY;
+
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      e.preventDefault();
+      const next = x.get() + deltaX;
+      const clamped = Math.max(-maxOffset, Math.min(0, next));
+      x.set(clamped);
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = () => {
+      isTouchDragging = false;
+    };
+
     section.addEventListener("wheel", handleScroll, { passive: false });
+    section.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    section.addEventListener("touchmove", handleTouchMove, { passive: false });
+    section.addEventListener("touchend", handleTouchEnd);
+    section.addEventListener("touchcancel", handleTouchEnd);
 
     return () => {
       section.removeEventListener("wheel", handleScroll);
+      section.removeEventListener("touchstart", handleTouchStart);
+      section.removeEventListener("touchmove", handleTouchMove);
+      section.removeEventListener("touchend", handleTouchEnd);
+      section.removeEventListener("touchcancel", handleTouchEnd);
       window.removeEventListener("resize", updateBounds);
     };
   }, [maxOffset, x]);
 
   return (
     <section
+      id="certifications"
       ref={sectionRef}
       className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pt-24"
     >
@@ -68,7 +116,7 @@ export default function Certification() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="mb-10 text-center text-4xl font-semibold text-neutral-900 sm:text-5xl lg:mb-14"
+        className="mb-10 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-14"
       >
         Certifications
       </motion.h1>
@@ -102,7 +150,7 @@ export default function Certification() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="text-base font-semibold text-neutral-900 sm:text-lg">
+                    <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
                       {c.title}
                     </h3>
                     <p className="text-md text-neutral-600">{c.issuer}</p>

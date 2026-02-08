@@ -86,7 +86,10 @@ export const Technologies = (): JSX.Element => {
   }, [isInView]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+    <main
+      id="technologies"
+      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
+    >
       {/* Enhanced Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(108,92,231,0.08),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.04),transparent_30%)]" />

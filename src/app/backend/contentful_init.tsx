@@ -54,29 +54,31 @@ export async function getFeaturedProjects(): Promise<Project[]> {
   });
 
   return entries.items
-    .map((item) => ({
-      id: item.sys.id,
-      title: item.fields.title ?? "Untitled",
-      slug: item.fields.slug ?? "",
-      headline: item.fields.headline,
-      imageUrl:
-        item.fields.heroImage &&
-        isAsset(item.fields.heroImage) &&
-        item.fields.heroImage.fields?.file?.url
-          ? `https:${item.fields.heroImage.fields.file.url}`
-          : undefined,
-      coverPageUrl:
-        item.fields.coverPage &&
-        isAsset(item.fields.coverPage) &&
-        item.fields.coverPage.fields?.file?.url
-          ? `https:${item.fields.coverPage.fields.file.url}`
-          : undefined,
-      projectType: item.fields.projectType,
-      keyFeatures: item.fields.keyFeatures,
-      role: item.fields.role,
-      technologies: item.fields.technologies,
-      order: item.fields.order,
-    }))
+    .map((item) => {
+      return {
+        id: item.sys.id,
+        title: item.fields.title ?? "Untitled",
+        slug: item.fields.slug ?? "",
+        headline: item.fields.headline,
+        imageUrl:
+          item.fields.heroImage &&
+          isAsset(item.fields.heroImage) &&
+          item.fields.heroImage.fields?.file?.url
+            ? `https:${item.fields.heroImage.fields.file.url}`
+            : undefined,
+        coverPageUrl:
+          item.fields.coverPage &&
+          isAsset(item.fields.coverPage) &&
+          item.fields.coverPage.fields?.file?.url
+            ? `https:${item.fields.coverPage.fields.file.url}`
+            : undefined,
+        projectType: item.fields.projectType,
+        keyFeatures: item.fields.keyFeatures || [],
+        role: item.fields.role,
+        technologies: item.fields.technologies,
+        order: item.fields.order,
+      };
+    })
     .filter((p) => p.slug);
 }
 
@@ -108,7 +110,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
         ? `https:${item.fields.coverPage.fields.file.url}`
         : undefined,
     projectType: item.fields.projectType,
-    keyFeatures: item.fields.keyFeatures,
+    keyFeatures: item.fields.keyFeatures || [],
     role: item.fields.role,
     technologies: item.fields.technologies,
     order: item.fields.order,

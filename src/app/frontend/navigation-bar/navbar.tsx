@@ -1,5 +1,6 @@
 "use client";
 import {
+  animate,
   motion,
   useMotionValueEvent,
   useScroll,
@@ -7,6 +8,7 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState } from "react";
 import { usePageTransition } from "../page-transition/page-transition";
@@ -25,6 +27,7 @@ export default function NavigationBar() {
   const [isHidden, setIsHidden] = useState(false);
   const { scrollY } = useScroll();
   const { startTransition } = usePageTransition();
+  const pathname = usePathname();
 
   const backgroundColor = useTransform(
     scrollY,
@@ -43,14 +46,31 @@ export default function NavigationBar() {
     setIsHidden(!isNearTop);
   });
 
+  const smoothScrollTo = (targetY: number) => {
+    animate(window.scrollY, targetY, {
+      duration: 0.8,
+      ease: "easeInOut",
+      onUpdate: (latest) => window.scrollTo(0, latest),
+    });
+  };
+
   const handleNavigate = (
     event: MouseEvent<HTMLAnchorElement>,
     href: string,
   ) => {
     const isHashLink = href.startsWith("/#") || href.startsWith("#");
-    const shouldAnimateHash = href === "/#projects";
-    if (isHashLink && !shouldAnimateHash) {
+    if (isHashLink) {
       setIsMenuOpen(false);
+      const hash = href.split("#")[1];
+      if (pathname === "/" && hash) {
+        const target = document.getElementById(hash);
+        if (target) {
+          event.preventDefault();
+          const top = target.getBoundingClientRect().top + window.scrollY - 96;
+          smoothScrollTo(top);
+          history.replaceState(null, "", `/#${hash}`);
+        }
+      }
       return;
     }
     event.preventDefault();
@@ -122,7 +142,7 @@ export default function NavigationBar() {
                   <Link
                     href={link.href}
                     onClick={(event) => handleNavigate(event, link.href)}
-                    className="group relative px-4 py-2 text-black/80 font-medium transition-all duration-300"
+                    className="group relative px-4 py-2 text-black/80 font-medium uppercase transition-all duration-300"
                     style={{
                       fontSize: "24px",
                       lineHeight: "normal",
@@ -165,7 +185,7 @@ export default function NavigationBar() {
               >
                 <Link
                   href="/#contact"
-                  className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-black/10 bg-black px-5 py-2.5 shadow-lg shadow-black/20 transition-all duration-300 hover:bg-white hover:border-black/30"
+                  className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-black/10 bg-neutral-800 px-5 py-2.5 shadow-lg shadow-black/20 transition-all duration-300 hover:bg-white hover:border-black/30"
                   style={{
                     fontSize: "18px",
                     lineHeight: "normal",
@@ -179,12 +199,12 @@ export default function NavigationBar() {
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   />
                   <span
-                    className="relative z-10 font-semibold text-white transition-colors duration-300 group-hover:text-black"
+                    className="relative z-10 font-semibold text-white transition-colors duration-300 group-hover:text-neutral-800"
                     style={{
                       letterSpacing: "0.4px",
                     }}
                   >
-                    Contact me
+                    CONTACT ME
                   </span>
                 </Link>
               </motion.div>
@@ -267,7 +287,7 @@ export default function NavigationBar() {
                 <Link
                   href={link.href}
                   onClick={(event) => handleNavigate(event, link.href)}
-                  className="block rounded-2xl px-6 py-4 text-2xl font-semibold text-black text-center transition-all duration-200 hover:bg-black/5"
+                  className="block rounded-2xl px-6 py-4 text-2xl font-semibold text-black text-center uppercase transition-all duration-200 hover:bg-black/5"
                 >
                   {link.label}
                 </Link>

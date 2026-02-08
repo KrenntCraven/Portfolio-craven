@@ -24,8 +24,10 @@ type Phase = "idle" | "cover" | "reveal";
 
 export function PageTransitionProvider({
   children,
+  disableOnPaths = [],
 }: {
   children: React.ReactNode;
+  disableOnPaths?: string[];
 }) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
@@ -34,10 +36,15 @@ export function PageTransitionProvider({
   const startTransition = useCallback(
     (href: string) => {
       if (phase !== "idle") return;
+      const shouldDisable = disableOnPaths.includes(href);
+      if (shouldDisable) {
+        router.push(href);
+        return;
+      }
       nextHrefRef.current = href;
       setPhase("cover");
     },
-    [phase],
+    [disableOnPaths, phase, router],
   );
 
   const handleAnimationComplete = useCallback(() => {

@@ -1,6 +1,7 @@
 "use client";
-import { motion } from "framer-motion";
+import { animate, motion } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 import Certification from "./certification-page";
 import ExperiencePage from "./experience-page";
@@ -13,6 +14,81 @@ const fadeUp = {
 };
 
 export default function About() {
+  const isSnappingRef = useRef(false);
+
+  const smoothScrollTo = (targetY: number) => {
+    if (isSnappingRef.current) return;
+    isSnappingRef.current = true;
+    animate(window.scrollY, targetY, {
+      duration: 0.9,
+      ease: "easeInOut",
+      onUpdate: (latest) => window.scrollTo(0, latest),
+      onComplete: () => {
+        isSnappingRef.current = false;
+      },
+    });
+  };
+
+  useEffect(() => {
+    const sections = ["about", "experience", "certifications", "technologies"];
+
+    const handleWheel = (event: WheelEvent) => {
+      if (isSnappingRef.current) return;
+
+      const targetNode = event.target as HTMLElement | null;
+      if (targetNode?.closest("#certifications")) {
+        return;
+      }
+
+      const sectionEls = sections
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => Boolean(el));
+      if (!sectionEls.length) return;
+
+      const sectionsWithBounds = sectionEls
+        .map((el) => {
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + window.scrollY;
+          const bottom = top + rect.height;
+          return { el, top, bottom };
+        })
+        .sort((a, b) => a.top - b.top);
+
+      const currentY = window.scrollY;
+      const delta = event.deltaY;
+      const threshold = 140;
+
+      const currentIndex = sectionsWithBounds.findIndex(
+        ({ top, bottom }) =>
+          currentY >= top - threshold && currentY < bottom - threshold,
+      );
+
+      if (currentIndex === -1) return;
+
+      const currentSection = sectionsWithBounds[currentIndex];
+
+      if (delta > 0) {
+        const isNearBottom =
+          currentY >= currentSection.bottom - window.innerHeight - threshold;
+        const next = sectionsWithBounds[currentIndex + 1];
+        if (isNearBottom && next) {
+          event.preventDefault();
+          smoothScrollTo(next.top);
+        }
+      } else if (delta < 0) {
+        const isNearTop = currentY <= currentSection.top + threshold;
+        const prev = sectionsWithBounds[currentIndex - 1];
+        if (isNearTop && prev) {
+          event.preventDefault();
+          smoothScrollTo(prev.top);
+        }
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
+
   return (
     <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-24">
       {/* Background decorations */}
@@ -22,12 +98,15 @@ export default function About() {
         <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
       </div>
 
-      <section className="relative mx-auto max-w-6xl px-4 py-18 sm:px-6 sm:py-16 lg:px-8 lg:pt-22 lg:pb-20 min-h-[190px] sm:min-h-[20vh] lg:min-h-[60vh]">
+      <section
+        id="about"
+        className="relative mx-auto max-w-6xl px-4 py-18 sm:px-6 sm:py-16 lg:px-8 lg:pt-22 lg:pb-20 min-h-[190px] sm:min-h-[20vh] lg:min-h-[60vh]"
+      >
         <motion.h2
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-12 text-center text-4xl font-semibold text-neutral-900 sm:text-5xl lg:mb-16"
+          className="mb-12 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-16"
         >
           My Engineering Journey
         </motion.h2>
@@ -41,7 +120,7 @@ export default function About() {
             className="w-full lg:flex-[1.5]"
           >
             <div className="w-full space-y-8">
-              <div className="space-y-6 text-base text-neutral-700 sm:text-lg">
+              <div className="space-y-6 text-base text-neutral-600 sm:text-lg">
                 <motion.p
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

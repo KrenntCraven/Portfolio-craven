@@ -61,7 +61,7 @@ export const Education = (): JSX.Element => {
                     <h2 className="text-2xl font-semibold text-neutral-900 sm:text-3xl">
                       {item.title}
                     </h2>
-                    <span className="whitespace-nowrap text-base font-medium text-neutral-800 sm:text-base md:text-lg lg:text-xl">
+                    <span className="whitespace-nowrap text-base font-medium text-neutral-700 sm:text-base md:text-lg lg:text-xl">
                       {item.period}
                     </span>
                   </div>

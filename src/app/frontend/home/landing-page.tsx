@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { motion } from "framer-motion";
+import { animate, motion } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { socials } from "./socials-link";
 
 const fadeUp = {
@@ -12,8 +13,69 @@ const fadeUp = {
 };
 
 export default function LandingPage() {
+  const isSnappingRef = useRef(false);
+
+  const smoothScrollTo = (targetY: number) => {
+    if (isSnappingRef.current) return;
+    isSnappingRef.current = true;
+    animate(window.scrollY, targetY, {
+      duration: 0.8,
+      ease: "easeInOut",
+      onUpdate: (latest) => window.scrollTo(0, latest),
+      onComplete: () => {
+        isSnappingRef.current = false;
+      },
+    });
+  };
+
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (isSnappingRef.current) return;
+
+      const projectsSection = document.getElementById("projects");
+      if (!projectsSection) return;
+
+      const projectsTop =
+        projectsSection.getBoundingClientRect().top + window.scrollY;
+      const currentY = window.scrollY;
+      const delta = event.deltaY;
+
+      if (delta > 0 && currentY < projectsTop - 40) {
+        event.preventDefault();
+        smoothScrollTo(projectsTop);
+      }
+
+      if (delta < 0 && currentY >= projectsTop - 40) {
+        event.preventDefault();
+        smoothScrollTo(0);
+      }
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  const handleSocialClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    const isHashLink = href.startsWith("/#") || href.startsWith("#");
+    if (!isHashLink) return;
+
+    const hash = href.split("#")[1];
+    if (!hash) return;
+
+    const target = document.getElementById(hash);
+    if (!target) return;
+
+    event.preventDefault();
+    const top = target.getBoundingClientRect().top + window.scrollY - 96;
+    smoothScrollTo(top);
+    history.replaceState(null, "", `/#${hash}`);
+  };
+
   return (
-    <main className="relative overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[700px]">
+    <main className="relative overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[820px]">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -77,11 +139,11 @@ export default function LandingPage() {
             </motion.span>
           </motion.div>
 
-          <h1 className="text-[1.75rem] font-semibold leading-tight text-neutral-900 sm:text-[2.35rem] md:text-[2.6rem] lg:text-[2.75rem]">
+          <h1 className="text-[1.75rem] font-semibold leading-tight text-neutral-800 sm:text-[2.35rem] md:text-[2.6rem] lg:text-[2.75rem]">
             Software Engineer Focused on Reliable Web and Mobile Solutions.
           </h1>
 
-          <p className="max-w-2xl text-base sm:text-lg md:text-xl text-neutral-700">
+          <p className="max-w-2xl text-base sm:text-lg md:text-xl text-neutral-600">
             I turn ideas into scalable, real-world applications.
           </p>
 
@@ -99,6 +161,7 @@ export default function LandingPage() {
                 <Button
                   as="a"
                   href={item.href}
+                  onClick={(event) => handleSocialClick(event, item.href)}
                   {...(item.external && {
                     target: "_blank",
                     rel: "noopener noreferrer",

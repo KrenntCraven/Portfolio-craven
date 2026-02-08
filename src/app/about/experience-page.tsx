@@ -9,7 +9,10 @@ const fadeUp = {
 
 export default function ExperiencePage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+    <main
+      id="experience"
+      className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
+    >
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -17,13 +20,13 @@ export default function ExperiencePage() {
         <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
       </div>
 
-      <section className="relative mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pt-24">
+      <section className="relative mx-auto max-w-6xl px-4 pb-24 pt-12 sm:px-6 sm:pb-28 sm:pt-16 lg:px-8 lg:pt-24">
         {/* Page Title */}
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-12 text-center text-4xl font-semibold text-neutral-900 sm:text-5xl lg:mb-16"
+          className="mb-12 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-16"
         >
           Work Experience
         </motion.h1>
@@ -55,10 +58,10 @@ export default function ExperiencePage() {
                 >
                   {/* Company and Period */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <h2 className="text-2xl font-semibold text-neutral-900 sm:text-3xl">
+                    <h2 className="text-2xl font-semibold text-neutral-800 sm:text-3xl">
                       {exp.company}
                     </h2>
-                    <span className="whitespace-nowrap text-base font-medium text-neutral-800 sm:text-base md:text-lg lg:text-xl">
+                    <span className="whitespace-nowrap text-base font-medium text-neutral-600 sm:text-base md:text-lg lg:text-xl">
                       {exp.period}
                     </span>
                   </div>

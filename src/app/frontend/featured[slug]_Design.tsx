@@ -1,4 +1,6 @@
-export const FeaturedSlugDesign = () => (
+import { memo } from "react";
+
+export const FeaturedSlugDesign = memo(() => (
   <svg
     width="784"
     height="784"
@@ -34,4 +36,4 @@ export const FeaturedSlugDesign = () => (
       <circle cx="391.978" cy="391.978" r="97.9945" fill="#64748B" />
     </g>
   </svg>
-);
+));

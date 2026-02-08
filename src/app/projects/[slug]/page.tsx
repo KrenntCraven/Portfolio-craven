@@ -1,8 +1,8 @@
 "use client";
 import { FeaturedSlugDesign } from "@/app/frontend/featured[slug]_Design";
+import { usePageTransition } from "@/app/frontend/page-transition/page-transition";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProjectBySlug, type Project } from "../../backend/contentful_init";
@@ -15,16 +15,54 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
+// Helper function to parse bold markdown syntax
+const parseBold = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
 export default function ProjectPage({ params }: PageProps) {
+  const { startTransition } = usePageTransition();
   const [project, setProject] = useState<Project | null>(null);
   const [slug, setSlug] = useState<string>("");
+  const [imageAspectRatio, setImageAspectRatio] =
+    useState<string>("aspect-square");
+  const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     params.then((p) => {
       setSlug(p.slug);
+      setIsImageLoaded(false);
       getProjectBySlug(p.slug).then((data) => {
         if (!data) notFound();
         setProject(data);
+        if (data.imageUrl) {
+          setImageAspectRatio("aspect-square");
+          const img = new window.Image();
+          img.src = data.imageUrl;
+          img.onload = () => {
+            const aspectRatio = img.width / img.height;
+            // More precise aspect ratio detection
+            if (aspectRatio >= 1.3) {
+              // Wide landscape images (16:9, etc.)
+              setImageAspectRatio("aspect-video");
+            } else if (aspectRatio >= 0.9 && aspectRatio < 1.3) {
+              // Nearly square images (including 579x534 = 1.08)
+              setImageAspectRatio("aspect-square");
+            } else {
+              // Portrait images
+              setImageAspectRatio("aspect-[4/5]");
+            }
+            setIsImageLoaded(true);
+          };
+        } else {
+          setIsImageLoaded(true);
+        }
       });
     });
   }, [params]);
@@ -62,13 +100,15 @@ export default function ProjectPage({ params }: PageProps) {
       </div>
 
       {/* Back button */}
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-8">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+      <div className="relative z-20 mx-auto mt-16 sm:mt-0 max-w-6xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+        {" "}
+        <button
+          type="button"
+          onClick={() => startTransition("/")}
+          className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-300 bg-white/80 px-4 py-2.5 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0 sm:w-auto sm:text-base sm:px-4 sm:py-2.5"
         >
           <svg
-            className="h-4 w-4"
+            className="h-4 w-4 sm:h-5 sm:w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -81,9 +121,8 @@ export default function ProjectPage({ params }: PageProps) {
             />
           </svg>
           Back to projects
-        </Link>
+        </button>
       </div>
-
       <section className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:pt-16 lg:pb-20">
         <div className="flex w-full flex-col items-center gap-8 sm:gap-12 lg:flex-row lg:items-start lg:gap-16">
           {/* Left Column - Content */}
@@ -100,7 +139,7 @@ export default function ProjectPage({ params }: PageProps) {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl lg:text-5xl"
+                className="text-4xl font-bold tracking-tight text-neutral-800 sm:text-5xl lg:text-5xl"
               >
                 {project.title}
               </motion.h1>
@@ -111,7 +150,7 @@ export default function ProjectPage({ params }: PageProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="text-lg text-neutral-700 sm:text-xl leading-relaxed max-w-md"
+                  className="text-lg text-neutral-600 sm:text-xl leading-relaxed max-w-md"
                 >
                   {project.headline}
                 </motion.p>
@@ -128,7 +167,7 @@ export default function ProjectPage({ params }: PageProps) {
                   {projectTypes.map((type, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center rounded-full bg-neutral-200 px-4 py-1.5 text-sm font-medium text-neutral-900 border border-neutral-300"
+                      className="inline-flex items-center rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-neutral-900 border border-neutral-300"
                     >
                       {type}
                     </span>
@@ -142,9 +181,9 @@ export default function ProjectPage({ params }: PageProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
-                  className="space-y-4"
+                  className="space-y-4 max-w-lg"
                 >
-                  <h2 className="text-2xl font-semibold text-neutral-900">
+                  <h2 className="text-2xl font-semibold text-neutral-800">
                     Key Features
                   </h2>
                   <ul className="space-y-3">
@@ -157,10 +196,10 @@ export default function ProjectPage({ params }: PageProps) {
                           delay: 0.6 + index * 0.05,
                           duration: 0.4,
                         }}
-                        className="flex items-start gap-3 text-base text-neutral-700 leading-relaxed"
+                        className="flex items-start gap-3 text-base text-neutral-600 leading-relaxed"
                       >
                         <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500" />
-                        <span>{feature}</span>
+                        <span>{parseBold(feature)}</span>
                       </motion.li>
                     ))}
                   </ul>
@@ -175,10 +214,10 @@ export default function ProjectPage({ params }: PageProps) {
                   transition={{ duration: 0.5, delay: 0.7 }}
                   className="space-y-2"
                 >
-                  <h3 className="text-lg font-semibold text-neutral-900">
+                  <h3 className="text-lg font-semibold text-neutral-800">
                     Role
                   </h3>
-                  <p className="text-base text-neutral-700">{project.role}</p>
+                  <p className="text-base text-neutral-600">{project.role}</p>
                 </motion.div>
               )}
 
@@ -190,14 +229,14 @@ export default function ProjectPage({ params }: PageProps) {
                   transition={{ duration: 0.5, delay: 0.8 }}
                   className="space-y-3"
                 >
-                  <h3 className="text-lg font-semibold text-neutral-900">
+                  <h3 className="text-lg font-semibold text-neutral-800">
                     Technologies
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {technologies.map((tech, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white"
+                        className="inline-flex items-center rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white relative z-20"
                       >
                         {tech}
                       </span>
@@ -211,36 +250,48 @@ export default function ProjectPage({ params }: PageProps) {
           {/* Right Column - Hero Image */}
           <motion.div
             {...fadeUp}
-            initial="initial"
+            initial={false}
             animate="animate"
             transition={{ delay: 0.2, duration: 0.7 }}
             className="w-full lg:flex-[0.85]"
           >
             <div className="relative flex flex-col items-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-none"
-              >
+              <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-none">
                 {project.imageUrl ? (
-                  <div className="relative aspect-square w-full rounded-2xl sm:rounded-3xl">
-                    {/* SVG Background */}
-                    <div className="absolute inset-0 flex items-center justify-center overflow-visible">
-                      <FeaturedSlugDesign />
-                    </div>
+                  imageAspectRatio && isImageLoaded ? (
+                    <div
+                      className={`relative ${imageAspectRatio} w-full rounded-2xl sm:rounded-3xl transition-opacity duration-500 opacity-100`}
+                    >
+                      {/* SVG Background */}
+                      <div className="absolute inset-0 flex items-center justify-center overflow-visible z-0">
+                        <FeaturedSlugDesign />
+                      </div>
 
-                    {/* Image on top */}
-                    <div className="relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl select-none">
-                      <Image
-                        src={project.imageUrl}
-                        alt={project.title}
-                        fill
-                        className="object-contain relative z-10 select-none pointer-events-none p-12 sm:p-8 md:p-10 lg:p-0"
-                        priority
-                      />
+                      {/* Image on top */}
+                      <div
+                        className={`relative z-10 ${imageAspectRatio} w-full rounded-2xl sm:rounded-3xl select-none`}
+                      >
+                        <Image
+                          src={project.imageUrl}
+                          alt={project.title}
+                          fill
+                          className={`object-contain object-center relative z-10 select-none pointer-events-none lg:scale-110 ${
+                            imageAspectRatio === "aspect-video"
+                              ? "translate-x-2 p-0 sm:translate-x-4 sm:p-0.5 md:translate-x-4 md:p-1 lg:translate-x-8 lg:scale-115 lg:p-0"
+                              : "p-6 sm:p-4 md:p-5 lg:p-2 lg:-translate-x-2"
+                          }`}
+                          priority
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative z-0 aspect-square w-full rounded-2xl sm:rounded-3xl">
+                      <div className="absolute inset-0 flex items-center justify-center overflow-visible z-0">
+                        <FeaturedSlugDesign />
+                      </div>
+                      <div className="flex h-full w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl" />
+                    </div>
+                  )
                 ) : (
                   <div className="flex aspect-square w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl">
                     <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-xl sm:rounded-2xl border border-neutral-200 bg-white text-4xl sm:text-5xl font-bold text-neutral-700 shadow-lg">
@@ -248,7 +299,7 @@ export default function ProjectPage({ params }: PageProps) {
                     </div>
                   </div>
                 )}
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         </div>
