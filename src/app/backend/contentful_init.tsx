@@ -1,3 +1,4 @@
+import type { Document } from "@contentful/rich-text-types";
 import type { Asset, EntryFieldTypes } from "contentful";
 import { createClient } from "contentful";
 
@@ -19,7 +20,9 @@ interface ProjectEntryFields {
   projectType?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
   keyFeatures?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
   role?: EntryFieldTypes.Text;
+  githubLink?: EntryFieldTypes.Text;
   technologies?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+  caseStudy?: EntryFieldTypes.RichText;
   order?: EntryFieldTypes.Integer;
 }
 
@@ -40,6 +43,8 @@ export type Project = {
   role?: string;
   technologies?: string[];
   order?: number;
+  githubLink?: string;
+  caseStudy?: Document;
 };
 
 // Helper function to check if asset is resolved
@@ -76,6 +81,8 @@ export async function getFeaturedProjects(): Promise<Project[]> {
         keyFeatures: item.fields.keyFeatures || [],
         role: item.fields.role,
         technologies: item.fields.technologies,
+        caseStudy: item.fields.caseStudy,
+        githubLink: item.fields.githubLink,
         order: item.fields.order,
       };
     })
@@ -112,7 +119,9 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     projectType: item.fields.projectType,
     keyFeatures: item.fields.keyFeatures || [],
     role: item.fields.role,
+    caseStudy: item.fields.caseStudy,
     technologies: item.fields.technologies,
+    githubLink: item.fields.githubLink,
     order: item.fields.order,
   };
 }

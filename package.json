@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@contentful/rich-text-react-renderer": "^16.1.6",
+    "@contentful/rich-text-types": "^17.2.5",
     "@heroicons/react": "^2.2.0",
     "@heroui/button": "^2.2.30",
     "@heroui/react": "^2.8.8",

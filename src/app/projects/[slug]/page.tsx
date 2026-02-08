@@ -3,11 +3,9 @@ import { FeaturedSlugDesign } from "@/app/frontend/featured[slug]_Design";
 import { usePageTransition } from "@/app/frontend/page-transition/page-transition";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProjectBySlug, type Project } from "../../backend/contentful_init";
-
-type PageProps = { params: Promise<{ slug: string }> };
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -26,46 +24,45 @@ const parseBold = (text: string) => {
   });
 };
 
-export default function ProjectPage({ params }: PageProps) {
+export default function ProjectPage() {
   const { startTransition } = usePageTransition();
   const [project, setProject] = useState<Project | null>(null);
-  const [slug, setSlug] = useState<string>("");
+  const params = useParams<{ slug: string }>();
+  const slug = params?.slug;
   const [imageAspectRatio, setImageAspectRatio] =
     useState<string>("aspect-square");
   const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    params.then((p) => {
-      setSlug(p.slug);
-      setIsImageLoaded(false);
-      getProjectBySlug(p.slug).then((data) => {
-        if (!data) notFound();
-        setProject(data);
-        if (data.imageUrl) {
-          setImageAspectRatio("aspect-square");
-          const img = new window.Image();
-          img.src = data.imageUrl;
-          img.onload = () => {
-            const aspectRatio = img.width / img.height;
-            // More precise aspect ratio detection
-            if (aspectRatio >= 1.3) {
-              // Wide landscape images (16:9, etc.)
-              setImageAspectRatio("aspect-video");
-            } else if (aspectRatio >= 0.9 && aspectRatio < 1.3) {
-              // Nearly square images (including 579x534 = 1.08)
-              setImageAspectRatio("aspect-square");
-            } else {
-              // Portrait images
-              setImageAspectRatio("aspect-[4/5]");
-            }
-            setIsImageLoaded(true);
-          };
-        } else {
+    if (!slug) return;
+    setIsImageLoaded(false);
+    getProjectBySlug(slug).then((data) => {
+      if (!data) notFound();
+      setProject(data);
+      if (data.imageUrl) {
+        setImageAspectRatio("aspect-square");
+        const img = new window.Image();
+        img.src = data.imageUrl;
+        img.onload = () => {
+          const aspectRatio = img.width / img.height;
+          // More precise aspect ratio detection
+          if (aspectRatio >= 1.3) {
+            // Wide landscape images (16:9, etc.)
+            setImageAspectRatio("aspect-video");
+          } else if (aspectRatio >= 0.9 && aspectRatio < 1.3) {
+            // Nearly square images (including 579x534 = 1.08)
+            setImageAspectRatio("aspect-square");
+          } else {
+            // Portrait images
+            setImageAspectRatio("aspect-[4/5]");
+          }
           setIsImageLoaded(true);
-        }
-      });
+        };
+      } else {
+        setIsImageLoaded(true);
+      }
     });
-  }, [params]);
+  }, [slug]);
 
   if (!project) return null;
 
@@ -241,6 +238,42 @@ export default function ProjectPage({ params }: PageProps) {
                         {tech}
                       </span>
                     ))}
+                  </div>
+                </motion.div>
+              )}
+              {/* Links */}
+              {(project.githubLink || project.caseStudy) && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.9 }}
+                  className="space-y-2"
+                >
+                  <h3 className="text-lg font-semibold text-neutral-800">
+                    Links
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {project.githubLink && (
+                      <a
+                        href={project.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-3 rounded-xl border border-neutral-300 bg-white/80 px-4 py-2.5 text-base font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0"
+                      >
+                        View repository
+                      </a>
+                    )}
+                    {project.caseStudy && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          startTransition(`/projects/${slug}/casestudy`)
+                        }
+                        className="inline-flex items-center gap-3 rounded-xl border border-neutral-300 bg-neutral-900 px-4 py-2.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0"
+                      >
+                        Case Study
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}
