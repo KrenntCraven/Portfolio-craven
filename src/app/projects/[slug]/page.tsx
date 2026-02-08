@@ -120,7 +120,7 @@ export default function ProjectPage() {
           Back to projects
         </button>
       </div>
-      <section className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:pt-16 lg:pb-20">
+      <section className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:pt-16 lg:pb-20">
         <div className="flex w-full flex-col items-center gap-8 sm:gap-12 lg:flex-row lg:items-start lg:gap-16">
           {/* Left Column - Content */}
           <motion.div
@@ -247,18 +247,18 @@ export default function ProjectPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.9 }}
-                  className="space-y-2"
+                  className="relative z-30 space-y-2"
                 >
                   <h3 className="text-lg font-semibold text-neutral-800">
                     Links
                   </h3>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                     {project.githubLink && (
                       <a
                         href={project.githubLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 rounded-xl border border-neutral-300 bg-white/80 px-4 py-2.5 text-base font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0"
+                        className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white/80 px-3 py-2 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0 sm:gap-3 sm:px-4 sm:py-2.5 sm:text-base"
                       >
                         View repository
                       </a>
@@ -269,7 +269,7 @@ export default function ProjectPage() {
                         onClick={() =>
                           startTransition(`/projects/${slug}/casestudy`)
                         }
-                        className="inline-flex items-center gap-3 rounded-xl border border-neutral-300 bg-neutral-900 px-4 py-2.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0"
+                        className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-neutral-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0 sm:gap-3 sm:px-4 sm:py-2.5 sm:text-base"
                       >
                         Case Study
                       </button>
@@ -286,7 +286,7 @@ export default function ProjectPage() {
             initial={false}
             animate="animate"
             transition={{ delay: 0.2, duration: 0.7 }}
-            className="w-full lg:flex-[0.85]"
+            className="relative z-0 w-full lg:flex-[0.85]"
           >
             <div className="relative flex flex-col items-center">
               <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-none">
