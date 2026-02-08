@@ -56,7 +56,7 @@ export default function LandingPage() {
   }, []);
 
   const handleSocialClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
+    event: React.MouseEvent<Element>,
     href: string,
   ) => {
     const isHashLink = href.startsWith("/#") || href.startsWith("#");
