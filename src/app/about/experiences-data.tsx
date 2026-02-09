@@ -4,9 +4,9 @@ export const experiences = [
     position: "Software Engineer",
     period: "August 2024 - Present",
     description: [
-      "Maintained and enhanced a legacy internal PHP web application on AWS, streamlining document management workflows for 1,000+ employees.",
-      "Integrated external APIs into a bundled telecom service, improving cross-platform engagement and supporting customer adoption and retention.",
-      "Built an automated task scheduler using AWS SNS and CloudWatch, reducing manual oversight and improving QA monitoring, resulting in a 14% productivity increase.",
+      "Optimized a legacy PHP web app on AWS, improving document workflows for 1,000+ users.",
+      "Integrated internal and third-party APIs into telecom services, boosting performance and user engagement.",
+      "Built AWS-based automation with SNS and CloudWatch, cutting manual QA and raising productivity by 14%.",
     ],
   },
   {
@@ -33,6 +33,44 @@ export const experiences = [
     period: "May 2023 - June 2024",
     description: [
       "Boosted growth by generating sales opportunities through research, lead qualification, and client relationships, achieving 5% sales increase and stronger customer retention.",
+    ],
+  },
+];
+
+export const experiencesMobile = [
+  {
+    company: "Amdocs",
+    position: "Software Engineer",
+    period: "August 2024 - Present",
+    description: [
+      "Maintained a PHP app on AWS, improving workflows for 1,000+ employees.",
+      "Built API integrations and automation, increasing productivity by 14%.",
+    ],
+  },
+  {
+    company: "Willis Towers Watson",
+    position: "Software Engineer Intern",
+    period: "Oct 2023 - April 2024",
+    description: [
+      "Improved frontend UX with ASP.NET MVC, cutting support tickets by 15%.",
+      "Implemented Azure AD authentication across PH, UK, and Germany.",
+    ],
+  },
+  {
+    company: "GCash (Mynt)",
+    position: "PMO Technology & Operations Intern",
+    period: "Jun 2023 - Sept 2023",
+    description: [
+      "Automated workflows and integrations, reducing manual work by 20%.",
+      "Improved Jira documentation and QA tracking.",
+    ],
+  },
+  {
+    company: "Global Scaling Group",
+    position: "Lead Generation Intern",
+    period: "May 2023 - June 2024",
+    description: [
+      "Generated qualified leads, contributing to 5% sales growth.",
     ],
   },
 ];

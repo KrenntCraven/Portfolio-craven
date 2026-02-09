@@ -1,8 +1,9 @@
 "use client";
 import { animate, motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { aboutMobileParagraphs, aboutParagraphs } from "./about-data";
 import Certification from "./certification-page";
 import ExperiencePage from "./experience-page";
 import { Technologies } from "./techonologies-page";
@@ -15,6 +16,18 @@ const fadeUp = {
 
 export default function About() {
   const isSnappingRef = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
 
   const smoothScrollTo = (targetY: number) => {
     if (isSnappingRef.current) return;
@@ -121,39 +134,17 @@ export default function About() {
           >
             <div className="w-full space-y-8">
               <div className="space-y-6 text-base text-neutral-600 sm:text-lg">
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="flex items-start gap-3 leading-[2.5] sm:leading-[2] lg:leading-[2] text-center sm:text-justify hyphens-auto"
-                >
-                  I started with a foundation in Computer Engineering, where I
-                  developed strong problem-solving skills and an interest in
-                  building software that addresses real-world needs. Through
-                  internships and early professional experience,
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="flex items-start gap-3 leading-[2.5] sm:leading-[2] lg:leading-[2] text-center sm:text-justify hyphens-auto"
-                >
-                  I worked on both internal tools and user-facing applications,
-                  gaining hands-on experience across frontend, backend, and
-                  cloud technologies.
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="flex items-start gap-3 leading-[2.5] sm:leading-[2] lg:leading-[2] text-center sm:text-justify hyphens-auto"
-                >
-                  Today, I focus on building reliable, maintainable applications
-                  using modern frameworks, continuously improving through clean
-                  architecture and practical, scalable solutions.
-                </motion.p>
+                {aboutData.map((text, index) => (
+                  <motion.p
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="flex items-start gap-3 leading-[2.5] sm:leading-[2] lg:leading-[2] text-center sm:text-justify hyphens-auto"
+                  >
+                    {text}
+                  </motion.p>
+                ))}
               </div>
             </div>
           </motion.div>

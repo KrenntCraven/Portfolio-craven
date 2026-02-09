@@ -35,22 +35,36 @@ export default function Certification() {
     const handleScroll = (e: WheelEvent) => {
       const sectionRect = section.getBoundingClientRect();
 
-      // Fixed: Check if section is visible in viewport
+      // More strict viewport check - section must be more centered
       const isSectionInView =
-        sectionRect.top < window.innerHeight * 0.7 &&
-        sectionRect.bottom > window.innerHeight * 0.3;
+        sectionRect.top < window.innerHeight * 0.4 &&
+        sectionRect.bottom > window.innerHeight * 0.6;
 
       if (!isSectionInView) return;
 
       if (maxOffset <= 0) return;
 
-      const delta =
-        Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      const deltaX = e.deltaX;
+      const deltaY = e.deltaY;
+
+      // Use both deltaX and deltaY for horizontal scrolling (trackpad/mouse)
+      const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
 
       if (delta === 0) return;
 
+      // Check boundaries
+      const currentX = x.get();
+      const isAtStart = currentX >= -5;
+      const isAtEnd = currentX <= -maxOffset + 5;
+
+      // Allow vertical scroll when at boundaries
+      if ((isAtStart && delta < 0) || (isAtEnd && delta > 0)) {
+        return;
+      }
+
+      // Hijack scroll within bounds
       e.preventDefault();
-      const next = x.get() - delta;
+      const next = currentX - delta;
       const clamped = Math.max(-maxOffset, Math.min(0, next));
       x.set(clamped);
     };

@@ -166,7 +166,7 @@ export const Technologies = (): JSX.Element => {
                   >
                     <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500 group-hover/item:scale-125 transition-transform duration-200" />
 
-                    <span className="text-left sm:text-justify hyphens-none group-hover/item:text-neutral-900 transition-colors duration-200">
+                    <span className="text-left sm:text-justify hyphens-auto sm:hyphens-auto md:text-left md:hyphens-auto lg:hyphens-none group-hover/item:text-neutral-800 transition-colors duration-200">
                       {item}
                     </span>
                   </motion.li>
