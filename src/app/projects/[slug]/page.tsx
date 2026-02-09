@@ -274,6 +274,16 @@ export default function ProjectPage() {
                         Case Study
                       </button>
                     )}
+                    {project.siteLink && (
+                      <a
+                        href={project.siteLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white/80 px-3 py-2 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md active:translate-y-0 sm:gap-3 sm:px-4 sm:py-2.5 sm:text-base"
+                      >
+                        View site
+                      </a>
+                    )}
                   </div>
                 </motion.div>
               )}

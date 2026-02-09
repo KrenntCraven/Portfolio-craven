@@ -12,7 +12,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Krennt Craven - Portfolio",
+  title: "Krennt Craven",
   description: "Krennt Craven's Personal Portfolio Website",
   icons: {
     icon: "/Logo.svg",

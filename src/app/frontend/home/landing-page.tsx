@@ -101,7 +101,7 @@ export default function LandingPage() {
             >
               <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white/50 shadow-2xl">
                 <Image
-                  src="/path-to-your-avatar.jpg"
+                  src="/Picture2.jpg"
                   alt="Avatar"
                   fill
                   className="object-cover"

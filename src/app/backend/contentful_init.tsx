@@ -21,6 +21,7 @@ interface ProjectEntryFields {
   keyFeatures?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
   role?: EntryFieldTypes.Text;
   githubLink?: EntryFieldTypes.Text;
+  siteLink?: EntryFieldTypes.Text;
   technologies?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
   caseStudy?: EntryFieldTypes.RichText;
   order?: EntryFieldTypes.Integer;
@@ -44,6 +45,7 @@ export type Project = {
   technologies?: string[];
   order?: number;
   githubLink?: string;
+  siteLink?: string;
   caseStudy?: Document;
 };
 
@@ -83,6 +85,7 @@ export async function getFeaturedProjects(): Promise<Project[]> {
         technologies: item.fields.technologies,
         caseStudy: item.fields.caseStudy,
         githubLink: item.fields.githubLink,
+        siteLink: item.fields.siteLink,
         order: item.fields.order,
       };
     })
@@ -120,6 +123,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     keyFeatures: item.fields.keyFeatures || [],
     role: item.fields.role,
     caseStudy: item.fields.caseStudy,
+    siteLink: item.fields.siteLink,
     technologies: item.fields.technologies,
     githubLink: item.fields.githubLink,
     order: item.fields.order,
