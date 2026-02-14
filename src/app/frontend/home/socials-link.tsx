@@ -52,4 +52,17 @@ export const socials = [
       </svg>
     ),
   },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/CravenKrennt/",
+    external: true,
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
+        <path
+          fill="currentColor"
+          d="M22 12c0-5.522-4.477-10-10-10S2 6.478 2 12c0 5.019 3.676 9.167 8.438 9.877v-6.987h-2.54v-2.89h2.54V9.797c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.632.771-1.632 1.562v1.877h2.773l-.443 2.89h-2.33v6.987C18.324 21.167 22 17.019 22 12z"
+        />
+      </svg>
+    ),
+  },
 ];

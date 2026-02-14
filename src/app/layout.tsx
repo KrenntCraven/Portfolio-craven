@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { ContactModalProvider } from "./frontend/contact-modal/contact-modal-context";
 import Footer from "./frontend/footer/footer";
 import NavigationBar from "./frontend/navigation-bar/navbar";
 import { PageTransitionProvider } from "./frontend/page-transition/page-transition";
@@ -30,9 +31,11 @@ export default function RootLayout({
         className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen`}
       >
         <PageTransitionProvider disableOnPaths={["/projects"]}>
-          <NavigationBar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <ContactModalProvider>
+            <NavigationBar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </ContactModalProvider>
         </PageTransitionProvider>
       </body>
     </html>

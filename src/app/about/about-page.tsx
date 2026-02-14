@@ -103,7 +103,7 @@ export default function About() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-24">
+    <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -169,7 +169,7 @@ export default function About() {
                     src="/Picture2.jpg"
                     alt="Avatar"
                     fill
-                    className="object-cover"
+                    className="object-cover select-none"
                     priority
                   />
                 </div>

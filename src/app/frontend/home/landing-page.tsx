@@ -104,7 +104,7 @@ export default function LandingPage() {
                   src="/Picture2.jpg"
                   alt="Avatar"
                   fill
-                  className="object-cover"
+                  className="object-cover select-none"
                   priority
                 />
               </div>
@@ -148,38 +148,40 @@ export default function LandingPage() {
           </p>
 
           <div className="grid w-full max-w-xl grid-cols-2 gap-2.5 sm:gap-3 sm:grid-cols-4">
-            {socials.map((item) => (
-              <motion.div
-                key={item.label}
-                whileHover={{
-                  y: -2,
-                  scale: 1.02,
-                }}
-                whileTap={{ scale: 0.97, y: 0 }}
-                transition={{ type: "spring", stiffness: 280, damping: 18 }}
-              >
-                <Button
-                  as="a"
-                  href={item.href}
-                  onClick={(event) => handleSocialClick(event, item.href)}
-                  {...(item.external && {
-                    target: "_blank",
-                    rel: "noopener noreferrer",
-                  })}
-                  startContent={
-                    <span className="text-neutral-900 text-sm sm:text-base">
-                      {item.icon}
-                    </span>
-                  }
-                  variant="bordered"
-                  radius="lg"
-                  fullWidth
-                  className="inline-flex items-center justify-center gap-1.5 sm:gap-2 overflow-hidden rounded-lg sm:rounded-xl border border-black/15 bg-white/55 px-3 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-semibold text-neutral-900 shadow-[0_8px_30px_-14px_rgba(0,0,0,0.4)] sm:shadow-[0_10px_40px_-16px_rgba(0,0,0,0.45)] backdrop-blur-lg hover:bg-white/80 hover:border-black/25 hover:shadow-[0_18px_55px_-26px_rgba(0,0,0,0.55)]"
+            {socials
+              .filter((item) => item.label !== "Facebook")
+              .map((item) => (
+                <motion.div
+                  key={item.label}
+                  whileHover={{
+                    y: -2,
+                    scale: 1.02,
+                  }}
+                  whileTap={{ scale: 0.97, y: 0 }}
+                  transition={{ type: "spring", stiffness: 280, damping: 18 }}
                 >
-                  {item.label}
-                </Button>
-              </motion.div>
-            ))}
+                  <Button
+                    as="a"
+                    href={item.href}
+                    onClick={(event) => handleSocialClick(event, item.href)}
+                    {...(item.external && {
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    })}
+                    startContent={
+                      <span className="text-neutral-900 text-sm sm:text-base">
+                        {item.icon}
+                      </span>
+                    }
+                    variant="bordered"
+                    radius="lg"
+                    fullWidth
+                    className="inline-flex items-center justify-center gap-1.5 sm:gap-2 overflow-hidden rounded-lg sm:rounded-xl border border-black/15 bg-white/55 px-3 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base font-semibold text-neutral-900 shadow-[0_8px_30px_-14px_rgba(0,0,0,0.4)] sm:shadow-[0_10px_40px_-16px_rgba(0,0,0,0.45)] backdrop-blur-lg hover:bg-white/80 hover:border-black/25 hover:shadow-[0_18px_55px_-26px_rgba(0,0,0,0.55)]"
+                  >
+                    {item.label}
+                  </Button>
+                </motion.div>
+              ))}
           </div>
         </motion.div>
       </section>

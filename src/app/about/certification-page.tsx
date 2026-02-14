@@ -151,26 +151,53 @@ export default function Certification() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 + i * 0.05 }}
-                className="relative min-w-[280px] sm:min-w-[320px] lg:min-w-[320px] rounded-2xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_-30px_rgba(0,0,0,0.45)] transition-transform duration-200 hover:-translate-y-1 hover:border-black/20 hover:z-10"
+                className="relative min-w-[280px] sm:min-w-[320px] lg:min-w-[320px] rounded-2xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_-30px_rgba(0,0,0,0.45)] transition-transform duration-200 hover:-translate-y-1 hover:border-black/20 hover:z-10 cursor-pointer"
               >
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="relative h-32 w-32 select-none sm:h-36 sm:w-36 lg:h-44 lg:w-44">
-                    <Image
-                      src={c.badge}
-                      alt={`${c.title} badge`}
-                      fill
-                      className="object-contain select-none pointer-events-none"
-                      draggable={false}
-                    />
+                {c.link ? (
+                  <a
+                    href={c.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center text-center gap-3 focus:outline-none focus:ring-0 rounded-2xl"
+                    tabIndex={0}
+                  >
+                    <div className="relative h-32 w-32 select-none sm:h-36 sm:w-36 lg:h-44 lg:w-44">
+                      <Image
+                        src={c.badge}
+                        alt={`${c.title} badge`}
+                        fill
+                        className="object-contain select-none pointer-events-none"
+                        draggable={false}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
+                        {c.title}
+                      </h3>
+                      <p className="text-md text-neutral-600">{c.issuer}</p>
+                      <p className="text-s text-neutral-500">{c.date}</p>
+                    </div>
+                  </a>
+                ) : (
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="relative h-32 w-32 select-none sm:h-36 sm:w-36 lg:h-44 lg:w-44">
+                      <Image
+                        src={c.badge}
+                        alt={`${c.title} badge`}
+                        fill
+                        className="object-contain select-none pointer-events-none"
+                        draggable={false}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
+                        {c.title}
+                      </h3>
+                      <p className="text-md text-neutral-600">{c.issuer}</p>
+                      <p className="text-s text-neutral-500">{c.date}</p>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
-                      {c.title}
-                    </h3>
-                    <p className="text-md text-neutral-600">{c.issuer}</p>
-                    <p className="text-s text-neutral-500">{c.date}</p>
-                  </div>
-                </div>
+                )}
               </motion.div>
             ))}
           </motion.div>

@@ -10,7 +10,7 @@ const client = createClient({
 
 const PROJECT_TYPE = "featuredProjects" as const;
 
-// Define proper Entry Skeleton Types
+// Entry Skeleton Types
 interface ProjectEntryFields {
   title: EntryFieldTypes.Text;
   slug: EntryFieldTypes.Text;
@@ -24,6 +24,11 @@ interface ProjectEntryFields {
   siteLink?: EntryFieldTypes.Text;
   technologies?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
   caseStudy?: EntryFieldTypes.RichText;
+  problemCaseStudy?: EntryFieldTypes.RichText;
+  solutionCaseStudy?: EntryFieldTypes.RichText;
+  technicalCaseStudy?: EntryFieldTypes.RichText;
+  impactOutcomeCaseStudy?: EntryFieldTypes.RichText;
+  challengesLearningsCaseStudy?: EntryFieldTypes.RichText;
   order?: EntryFieldTypes.Integer;
 }
 
@@ -47,6 +52,11 @@ export type Project = {
   githubLink?: string;
   siteLink?: string;
   caseStudy?: Document;
+  problemCaseStudy?: Document;
+  solutionCaseStudy?: Document;
+  technicalCaseStudy?: Document;
+  impactOutcomeCaseStudy?: Document;
+  challengesLearningsCaseStudy?: Document;
 };
 
 // Helper function to check if asset is resolved
@@ -82,8 +92,15 @@ export async function getFeaturedProjects(): Promise<Project[]> {
         projectType: item.fields.projectType,
         keyFeatures: item.fields.keyFeatures || [],
         role: item.fields.role,
-        technologies: item.fields.technologies,
+        // Case Study fields
         caseStudy: item.fields.caseStudy,
+        problemCaseStudy: item.fields.problemCaseStudy,
+        solutionCaseStudy: item.fields.solutionCaseStudy,
+        technicalCaseStudy: item.fields.technicalCaseStudy,
+        impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
+        challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
+
+        // Links
         githubLink: item.fields.githubLink,
         siteLink: item.fields.siteLink,
         order: item.fields.order,
@@ -101,7 +118,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
   const item = entries.items[0];
   if (!item) return null;
-
+  console.log("Contentful fields:", item.fields);
   return {
     id: item.sys.id,
     title: item.fields.title ?? "Untitled",
@@ -122,7 +139,14 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     projectType: item.fields.projectType,
     keyFeatures: item.fields.keyFeatures || [],
     role: item.fields.role,
+    // Case Study fields
     caseStudy: item.fields.caseStudy,
+    problemCaseStudy: item.fields.problemCaseStudy,
+    solutionCaseStudy: item.fields.solutionCaseStudy,
+    technicalCaseStudy: item.fields.technicalCaseStudy,
+    impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
+    challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
+    // Links
     siteLink: item.fields.siteLink,
     technologies: item.fields.technologies,
     githubLink: item.fields.githubLink,

@@ -11,6 +11,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState } from "react";
+import { useContactModal } from "../contact-modal/contact-modal-context";
 import { usePageTransition } from "../page-transition/page-transition";
 
 // Logo import
@@ -25,6 +26,7 @@ const navLinks = [
 export default function NavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const { open: openContactModal } = useContactModal();
   const { scrollY } = useScroll();
   const { startTransition } = usePageTransition();
   const pathname = usePathname();
@@ -82,7 +84,7 @@ export default function NavigationBar() {
     <>
       <motion.nav
         style={{ backgroundColor, boxShadow }}
-        className="fixed top-4 left-1/2 z-50 w-[95vw] -translate-x-1/2 rounded-2xl border border-black/6 backdrop-blur-2xl transition-all duration-300 shadow-lg shadow-black/10"
+        className="fixed top-2 sm:top-3 md:top-4 left-1/2 z-50 w-[95vw] -translate-x-1/2 rounded-xl sm:rounded-2xl border border-black/6 backdrop-blur-2xl transition-all duration-300 shadow-lg shadow-black/10"
         initial={{ y: -100 }}
         animate={{ y: isHidden ? -120 : 0 }}
         transition={{
@@ -90,8 +92,8 @@ export default function NavigationBar() {
           ease: [0.22, 1, 0.36, 1],
         }}
       >
-        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+        <div className="mx-auto w-full px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
             {/* Logo - Left Side */}
             <motion.div
               className="flex-shrink-0"
@@ -105,7 +107,7 @@ export default function NavigationBar() {
                 onClick={(event) => handleNavigate(event, "/")}
               >
                 <motion.div
-                  className="relative flex h-12 w-12 items-center justify-center overflow-hidden "
+                  className="relative flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center overflow-hidden"
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -122,7 +124,7 @@ export default function NavigationBar() {
                   <Image
                     src={Logo}
                     alt="KC Logo"
-                    className="relative z-10 h-11 w-11 object-contain"
+                    className="relative z-10 h-8 w-8 sm:h-9 sm:w-9 md:h-11 md:w-11 object-contain select-none"
                     priority
                   />
                 </motion.div>
@@ -183,8 +185,8 @@ export default function NavigationBar() {
                 whileHover={{ scale: 1.07, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Link
-                  href="/#contact"
+                <button
+                  onClick={() => openContactModal()}
                   className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg border border-black/10 bg-neutral-800 px-5 py-2.5 shadow-lg shadow-black/20 transition-all duration-300 hover:bg-white hover:border-black/30"
                   style={{
                     fontSize: "18px",
@@ -206,7 +208,7 @@ export default function NavigationBar() {
                   >
                     CONTACT ME
                   </span>
-                </Link>
+                </button>
               </motion.div>
             </motion.div>
 
@@ -219,12 +221,12 @@ export default function NavigationBar() {
             >
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="relative z-50 p-2 text-black transition-colors hover:text-black focus:outline-none"
+                className="relative z-50 p-1.5 sm:p-2 text-black transition-colors hover:text-black focus:outline-none"
                 aria-label="Toggle menu"
               >
                 <motion.div
                   animate={isMenuOpen ? "open" : "closed"}
-                  className="w-6 h-5 flex flex-col justify-between"
+                  className="w-5 h-4 sm:w-6 sm:h-5 flex flex-col justify-between"
                 >
                   <motion.span
                     className="w-full h-0.5 bg-current rounded-full"
@@ -303,10 +305,12 @@ export default function NavigationBar() {
               transition={{ duration: 0.3, delay: 0.4 }}
               className="pt-4"
             >
-              <Link
-                href="/#contact"
-                onClick={() => setIsMenuOpen(false)}
-                className="relative block w-full overflow-hidden rounded-2xl border border-black/10 bg-[var(--color-neutral-900)] px-6 py-4 text-center text-lg text-white font-semibold shadow-lg shadow-black/20 transition-all duration-300 hover:bg-[var(--color-neutral-900)]/90"
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  openContactModal();
+                }}
+                className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 bg-[var(--color-neutral-900)] px-6 py-4 text-center text-lg text-white font-semibold shadow-lg shadow-black/20 transition-all duration-300 hover:bg-[var(--color-neutral-900)]/90"
               >
                 <motion.span
                   className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent opacity-0"
@@ -323,11 +327,12 @@ export default function NavigationBar() {
                 >
                   Contact me
                 </motion.span>
-              </Link>
+              </button>
             </motion.div>
           </motion.div>
         </div>
       </motion.div>
+
     </>
   );
 }

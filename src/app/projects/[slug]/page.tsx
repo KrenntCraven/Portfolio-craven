@@ -1,7 +1,7 @@
 "use client";
 import { FeaturedSlugDesign } from "@/app/frontend/featured[slug]_Design";
 import { usePageTransition } from "@/app/frontend/page-transition/page-transition";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,6 +32,17 @@ export default function ProjectPage() {
   const [imageAspectRatio, setImageAspectRatio] =
     useState<string>("aspect-square");
   const [isImageLoaded, setIsImageLoaded] = useState<boolean>(false);
+
+  // Scroll to top when navigating to this project (e.g. from featured projects)
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [slug]);
 
   useEffect(() => {
     if (!slug) return;
@@ -64,31 +75,77 @@ export default function ProjectPage() {
     });
   }, [slug]);
 
-  if (!project) return null;
-
-  // Convert projectType to array if it's not already
-  const projectTypes = Array.isArray(project.projectType)
-    ? project.projectType
-    : project.projectType
-      ? [project.projectType]
-      : [];
-
-  // Convert technologies to array if it's not already
-  const technologies = Array.isArray(project.technologies)
-    ? project.technologies
-    : project.technologies
-      ? [project.technologies]
-      : [];
-
-  // Convert keyFeatures to array if it's not already
-  const keyFeatures = Array.isArray(project.keyFeatures)
-    ? project.keyFeatures
-    : project.keyFeatures
-      ? [project.keyFeatures]
-      : [];
+  const projectTypes = project
+    ? Array.isArray(project.projectType)
+      ? project.projectType
+      : project.projectType
+        ? [project.projectType]
+        : []
+    : [];
+  const technologies = project
+    ? Array.isArray(project.technologies)
+      ? project.technologies
+      : project.technologies
+        ? [project.technologies]
+        : []
+    : [];
+  const keyFeatures = project
+    ? Array.isArray(project.keyFeatures)
+      ? project.keyFeatures
+      : project.keyFeatures
+        ? [project.keyFeatures]
+        : []
+    : [];
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+    <AnimatePresence mode="wait">
+      {!project ? (
+        <motion.div
+          key="loader"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
+          className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-white text-neutral-900"
+        >
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
+            <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
+          </div>
+          <div className="relative z-10 flex flex-col items-center gap-6">
+            <div className="flex items-end justify-center gap-1.5 h-10">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1.5 rounded-full bg-neutral-800 origin-bottom"
+                  style={{ height: 24 }}
+                  initial={{ scaleY: 0, opacity: 0.6 }}
+                  animate={{ scaleY: 1, opacity: 1 }}
+                  transition={{
+                    delay: i * 0.08,
+                    duration: 0.4,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                />
+              ))}
+            </div>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.3 }}
+              className="text-sm font-medium text-neutral-500"
+            >
+              Loading project
+            </motion.p>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.main
+          key="content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
+        >
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -347,6 +404,8 @@ export default function ProjectPage() {
           </motion.div>
         </div>
       </section>
-    </main>
+        </motion.main>
+      )}
+    </AnimatePresence>
   );
 }
