@@ -118,7 +118,6 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
   const item = entries.items[0];
   if (!item) return null;
-  console.log("Contentful fields:", item.fields);
   return {
     id: item.sys.id,
     title: item.fields.title ?? "Untitled",

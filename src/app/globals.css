@@ -74,3 +74,52 @@ body {
 .prose li {
   margin-block: 0.25em;
 }
+
+/* Landing banner background (Apple-style, UI colors only) */
+.landing-banner-base {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108, 92, 231, 0.1), transparent 50%),
+    radial-gradient(ellipse 60% 80% at 80% 70%, rgba(0, 0, 0, 0.06), transparent 45%),
+    radial-gradient(ellipse 50% 50% at 20% 90%, rgba(0, 0, 0, 0.06), transparent 45%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .landing-banner-base {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108, 92, 231, 0.14), transparent 50%),
+      radial-gradient(ellipse 60% 80% at 80% 70%, rgba(255, 255, 255, 0.05), transparent 45%),
+      radial-gradient(ellipse 50% 50% at 20% 90%, rgba(255, 255, 255, 0.05), transparent 45%);
+  }
+}
+
+.landing-banner-orb-purple-1 {
+  background: radial-gradient(circle at 30% 30%, rgba(108, 92, 231, 0.22), rgba(108, 92, 231, 0.06) 50%, transparent 70%);
+}
+
+.landing-banner-orb-neutral {
+  background: radial-gradient(circle at 70% 30%, rgba(0, 0, 0, 0.09), rgba(0, 0, 0, 0.02) 40%, transparent 65%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .landing-banner-orb-neutral {
+    background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.07), transparent 50%);
+  }
+}
+
+.landing-banner-orb-purple-2 {
+  background: radial-gradient(circle at 40% 60%, rgba(108, 92, 231, 0.14), transparent 55%);
+}
+
+.landing-banner-orb-neutral-2 {
+  background: radial-gradient(circle at 60% 50%, rgba(0, 0, 0, 0.07), transparent 50%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .landing-banner-orb-neutral-2 {
+    background: radial-gradient(circle at 60% 50%, rgba(255, 255, 255, 0.06), transparent 55%);
+  }
+}
+
+.landing-banner-orb-purple-3 {
+  background: radial-gradient(circle at 50% 50%, rgba(108, 92, 231, 0.12), transparent 60%);
+}

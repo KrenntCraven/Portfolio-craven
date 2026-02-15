@@ -6,6 +6,5 @@ export const revalidate = 3600;
 // server Wrapper to fetch data and pass to client component
 export default async function FeaturedProjectsWrapper() {
   const projects = await getFeaturedProjects();
-  console.log("featured projects", projects);
   return <FeaturedProjectsClient projects={projects} />;
 }
