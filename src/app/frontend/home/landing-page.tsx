@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { animate, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { socials } from "./socials-link";
@@ -183,7 +189,7 @@ export default function LandingPage() {
             >
               <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white/50 shadow-2xl">
                 <Image
-                  src="/Picture2.jpg"
+                  src="/Picture.jpg"
                   alt="Avatar"
                   fill
                   className="object-cover select-none"
@@ -250,7 +256,8 @@ export default function LandingPage() {
                       target: "_blank",
                       rel: "noopener noreferrer",
                     })}
-                    {...("download" in item && item.download && { download: true })}
+                    {...("download" in item &&
+                      item.download && { download: true })}
                     startContent={
                       <span className="text-neutral-900 text-sm sm:text-base">
                         {item.icon}
