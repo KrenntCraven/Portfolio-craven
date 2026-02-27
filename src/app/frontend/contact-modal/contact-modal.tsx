@@ -114,7 +114,11 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
         onClose();
       }, 2000);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to send. Please try again.");
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -280,6 +284,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                         } px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 focus:border-black/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10`}
                         placeholder="Your Name:"
                       />
+
                       {errors.name && (
                         <motion.p
                           initial={{ opacity: 0, y: -5 }}
