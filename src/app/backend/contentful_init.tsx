@@ -153,4 +153,29 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
   };
 }
 
+// Resume content model types
+interface ResumeEntryFields {
+  resumeFile: EntryFieldTypes.AssetLink;
+}
+
+interface ResumeEntrySkeleton {
+  contentTypeId: "resume";
+  fields: ResumeEntryFields;
+}
+
+export async function getResumeUrl(): Promise<string | null> {
+  const entries = await client.getEntries<ResumeEntrySkeleton>({
+    content_type: "resume",
+    limit: 1,
+  });
+
+  const item = entries.items[0];
+  if (!item) return null;
+
+  const file = item.fields.resumeFile;
+  if (!isAsset(file) || !file.fields?.file?.url) return null;
+
+  return `https:${file.fields.file.url}`;
+}
+
 export default client;

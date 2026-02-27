@@ -1,4 +1,8 @@
-export const socials = [
+export function getSocials(resumeUrl: string | null) {
+  return socials(resumeUrl);
+}
+
+const socials = (resumeUrl: string | null) => [
   {
     label: "GitHub",
     href: "https://github.com/KrenntCraven",
@@ -40,9 +44,9 @@ export const socials = [
   },
   {
     label: "Resume",
-    href: "/Master-Resume.pdf",
-    external: false,
-    download: true,
+    href: resumeUrl ?? "/Master-Resume.pdf",
+    external: true,
+    download: !resumeUrl,
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
         <path

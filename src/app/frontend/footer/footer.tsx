@@ -13,7 +13,9 @@ import { useContactModal } from "../contact-modal/contact-modal-context";
 import { usePageTransition } from "../page-transition/page-transition";
 
 // Socials and navigation links
-import { socials } from "../home/socials-link";
+import { getSocials } from "../home/socials-link";
+
+const socials = getSocials(null);
 
 const navLinks = [
   { href: "/", label: "Home" },
