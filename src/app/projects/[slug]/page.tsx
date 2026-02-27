@@ -1,5 +1,6 @@
 "use client";
 import { FeaturedSlugDesign } from "@/app/frontend/featured[slug]_Design";
+import { BannerBackground } from "@/app/frontend/banner-background";
 import { usePageTransition } from "@/app/frontend/page-transition/page-transition";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -107,10 +108,7 @@ export default function ProjectPage() {
           exit={{ opacity: 0, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
           className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-white text-neutral-900"
         >
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
-            <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
-          </div>
+          <BannerBackground />
           <div className="relative z-10 flex flex-col items-center gap-6">
             <div className="flex items-end justify-center gap-1.5 h-10">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -146,12 +144,7 @@ export default function ProjectPage() {
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
         >
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
-        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
-        <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
-      </div>
+      <BannerBackground />
 
       {/* Back button */}
       <div className="relative z-20 mx-auto mt-16 sm:mt-0 max-w-6xl px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
@@ -252,7 +245,7 @@ export default function ProjectPage() {
                         }}
                         className="flex items-start gap-3 text-base text-neutral-600 leading-relaxed"
                       >
-                        <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500" />
+                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-neutral-500" />
                         <span>{parseBold(feature)}</span>
                       </motion.li>
                     ))}
@@ -369,16 +362,22 @@ export default function ProjectPage() {
 
                       {/* Image on top */}
                       <div
-                        className={`relative z-10 ${imageAspectRatio} w-full rounded-2xl sm:rounded-3xl select-none`}
+                        className={`relative z-10 ${imageAspectRatio} w-full rounded-2xl sm:rounded-3xl select-none ${
+                          imageAspectRatio === "aspect-[4/5]" || imageAspectRatio === "aspect-square"
+                            ? "lg:scale-[1.2] lg:origin-center overflow-visible"
+                            : ""
+                        }`}
                       >
                         <Image
                           src={project.imageUrl}
                           alt={project.title}
                           fill
-                          className={`object-contain object-center relative z-10 select-none pointer-events-none lg:scale-110 ${
+                          className={`object-contain object-center relative z-10 select-none pointer-events-none ${
                             imageAspectRatio === "aspect-video"
                               ? "translate-x-2 p-0 sm:translate-x-4 sm:p-0.5 md:translate-x-4 md:p-1 lg:translate-x-8 lg:scale-115 lg:p-0"
-                              : "p-6 sm:p-4 md:p-5 lg:p-2 lg:-translate-x-2"
+                              : imageAspectRatio === "aspect-[4/5]" || imageAspectRatio === "aspect-square"
+                                ? "p-0"
+                                : "p-6 sm:p-4 md:p-5 lg:p-2 lg:scale-110 lg:-translate-x-2"
                           }`}
                           priority
                         />
@@ -389,11 +388,11 @@ export default function ProjectPage() {
                       <div className="absolute inset-0 flex items-center justify-center overflow-visible z-0">
                         <FeaturedSlugDesign />
                       </div>
-                      <div className="flex h-full w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl" />
+                      <div className="flex h-full w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-linear-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl" />
                     </div>
                   )
                 ) : (
-                  <div className="flex aspect-square w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-gradient-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl">
+                  <div className="flex aspect-square w-full items-center justify-center rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-white/50 bg-linear-to-br from-neutral-100 via-neutral-50 to-white shadow-xl sm:shadow-2xl">
                     <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-xl sm:rounded-2xl border border-neutral-200 bg-white text-4xl sm:text-5xl font-bold text-neutral-700 shadow-lg">
                       {project.title.charAt(0).toUpperCase()}
                     </div>

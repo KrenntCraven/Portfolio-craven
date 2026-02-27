@@ -1,6 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { BannerBackground } from "../frontend/banner-background";
 import { experiences, experiencesMobile } from "./experiences-data";
 
 export default function ExperiencePage() {
@@ -22,11 +23,6 @@ export default function ExperiencePage() {
   const handleNext = () => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % data.length);
-  };
-
-  const handlePrev = () => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + data.length) % data.length);
   };
 
   const handleDotClick = (index: number) => {
@@ -52,14 +48,9 @@ export default function ExperiencePage() {
   return (
     <main
       id="experience"
-      className="relative min-h-[100dvh] overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
+      className="relative min-h-[100dvh] overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
     >
-      {/* Enhanced Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(108,92,231,0.08),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.04),transparent_30%)]" />
-        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-neutral-900/5 via-transparent to-transparent" />
-        <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-14rem] h-80 rounded-[40px] bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-indigo-500/10 blur-3xl" />
-      </div>
+      <BannerBackground />
 
       <section className="relative mx-auto max-w-6xl px-4 pb-8 pt-8 sm:px-6 sm:pb-12 sm:pt-16 md:pb-12 lg:px-8 lg:pb-16 lg:pt-24">
         {/* Page Title */}
@@ -74,48 +65,7 @@ export default function ExperiencePage() {
 
         {/* Carousel Container */}
         <div className="relative min-h-[450px] sm:min-h-[500px]">
-          {/* Navigation Buttons - Large screens only */}
-          <button
-            onClick={handlePrev}
-            className="absolute -left-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-neutral-200/60 bg-white/70 p-3 shadow-xl backdrop-blur-md transition-all hover:scale-110 hover:border-neutral-300 hover:bg-white hover:shadow-2xl disabled:opacity-50 lg:-left-16 lg:block hidden lg:p-4"
-            aria-label="Previous experience"
-          >
-            <svg
-              className="h-5 w-5 text-neutral-900 sm:h-6 sm:w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <button
-            onClick={handleNext}
-            className="absolute -right-3 top-1/2 z-10 -translate-y-1/2 rounded-full border border-neutral-200/60 bg-white/70 p-3 shadow-xl backdrop-blur-md transition-all hover:scale-110 hover:border-neutral-300 hover:bg-white hover:shadow-2xl disabled:opacity-50 lg:-right-16 lg:block hidden lg:p-4"
-            aria-label="Next experience"
-          >
-            <svg
-              className="h-5 w-5 text-neutral-900 sm:h-6 sm:w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-
-          {/* Carousel Content */}
+          {/* Carousel Content - tap/click card to go to next */}
           <div className="overflow-hidden px-2 sm:px-4">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -129,20 +79,21 @@ export default function ExperiencePage() {
                   x: { type: "spring", stiffness: 300, damping: 30 },
                   opacity: { duration: 0.2 },
                 }}
-                className="w-full"
+                className="flex w-full justify-center"
               >
-                <motion.div
-                  whileHover={{
-                    scale: 1.01,
-                    transition: { duration: 0.2 },
-                  }}
-                  className="group relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-neutral-200/60 bg-white/70 p-6 shadow-xl backdrop-blur-md hover:shadow-2xl transition-shadow duration-300 sm:p-8 lg:p-10"
+                <motion.button
+                  type="button"
+                  onClick={handleNext}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.995 }}
+                  className="group relative w-full cursor-pointer text-left max-w-4xl overflow-hidden rounded-2xl border border-neutral-200/70 bg-white/80 p-6 shadow-[0_18px_60px_-24px_rgba(15,23,42,0.25)] backdrop-blur-sm transition-all duration-300 hover:border-[#6c5ce7]/20 hover:shadow-[0_24px_70px_-22px_rgba(108,92,231,0.2)] sm:p-8 lg:p-10"
+                  aria-label="Next experience"
                 >
-                  {/* Animated gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-violet-500/0 via-purple-500/0 to-indigo-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
+                  {/* Subtle hover gradient */}
+                  <div className="absolute inset-0 bg-linear-to-br from-[#6c5ce7]/0 via-transparent to-[#6c5ce7]/0 opacity-0 transition-opacity duration-300 group-hover:opacity-[0.06]" />
 
-                  {/* Card shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                  {/* Card shine on hover */}
+                  <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
 
                   <div className="relative">
                     {/* Company and Period */}
@@ -181,35 +132,13 @@ export default function ExperiencePage() {
                       ))}
                     </ul>
                   </div>
-                </motion.div>
+                </motion.button>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Carousel Indicators with Navigation */}
-          <div className="mt-8 flex items-center justify-center gap-4 sm:mt-12">
-            {/* Previous Button - Small/Medium screens */}
-            <button
-              onClick={handlePrev}
-              className="rounded-full border border-neutral-200/60 bg-white/70 p-2.5 shadow-lg backdrop-blur-md transition-all hover:scale-110 hover:border-neutral-300 hover:bg-white hover:shadow-xl lg:hidden"
-              aria-label="Previous experience"
-            >
-              <svg
-                className="h-4 w-4 text-neutral-900"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-
-            {/* Indicators */}
+          {/* Dots + Counter */}
+          <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10">
             <div className="flex items-center gap-2.5">
               {data.map((_, index) => (
                 <button
@@ -217,46 +146,23 @@ export default function ExperiencePage() {
                   onClick={() => handleDotClick(index)}
                   className={`rounded-full transition-all duration-300 ${
                     index === currentIndex
-                      ? "h-2.5 w-10 bg-gradient-to-r from-neutral-800 to-neutral-900 shadow-lg"
-                      : "h-2.5 w-2.5 bg-neutral-300 hover:bg-neutral-500 hover:scale-125"
+                      ? "h-2.5 w-8 bg-[#6c5ce7] shadow-md"
+                      : "h-2.5 w-2.5 bg-neutral-300 hover:bg-neutral-400 hover:scale-110"
                   }`}
                   aria-label={`Go to experience ${index + 1}`}
                 />
               ))}
             </div>
-
-            {/* Next Button - Small/Medium screens */}
-            <button
-              onClick={handleNext}
-              className="rounded-full border border-neutral-200/60 bg-white/70 p-2.5 shadow-lg backdrop-blur-md transition-all hover:scale-110 hover:border-neutral-300 hover:bg-white hover:shadow-xl lg:hidden"
-              aria-label="Next experience"
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-center text-sm font-medium text-neutral-600"
             >
-              <svg
-                className="h-4 w-4 text-neutral-900"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
+              <span className="font-semibold text-neutral-800">{currentIndex + 1}</span>
+              <span className="text-neutral-500"> / {data.length}</span>
+            </motion.div>
           </div>
-
-          {/* Counter */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-4 text-center text-sm font-medium text-neutral-600 sm:mt-6"
-          >
-            <span className="text-neutral-900">{currentIndex + 1}</span> /{" "}
-            {data.length}
-          </motion.div>
         </div>
       </section>
     </main>

@@ -9,6 +9,7 @@ import { motion, useInView } from "framer-motion";
 import gsap from "gsap";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
+import { BannerBackground } from "../frontend/banner-background";
 import { TechCategory, technologies } from "./technologies-data";
 
 const cardVariants = {
@@ -88,15 +89,14 @@ export const Technologies = (): JSX.Element => {
   return (
     <main
       id="technologies"
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-neutral-50 to-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
+      className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
     >
-      {/* Enhanced Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(108,92,231,0.08),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.04),transparent_30%)]" />
-        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-neutral-900/5 via-transparent to-transparent" />
+      <BannerBackground />
+      {/* Animated bottom glow (GSAP-driven) */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           ref={glowRef}
-          className="absolute inset-x-12 sm:inset-x-24 bottom-[-14rem] h-80 rounded-[40px] bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-indigo-500/10 blur-3xl"
+          className="absolute inset-x-12 sm:inset-x-24 -bottom-48 h-72 rounded-[36px] bg-[#6c5ce7]/5 blur-3xl"
         />
       </div>
 

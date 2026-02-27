@@ -3,6 +3,7 @@ import { animate, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { BannerBackground } from "../frontend/banner-background";
 import { aboutMobileParagraphs, aboutParagraphs } from "./about-data";
 import Certification from "./certification-page";
 import ExperiencePage from "./experience-page";
@@ -16,100 +17,198 @@ const fadeUp = {
 
 export default function About() {
   const isSnappingRef = useRef(false);
+  const isMobileRef = useRef(false);
+  const cancelSnapRef = useRef<(() => void) | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 640px)");
-    setIsMobile(mediaQuery.matches);
+  const NAV_OFFSET = 80;
 
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+  const getSectionTops = () =>
+    Array.from(document.querySelectorAll<HTMLElement>("section[id], main[id]"))
+      .map((el) => {
+        const rawTop = el.getBoundingClientRect().top + window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        return Math.min(rawTop - NAV_OFFSET, maxScroll);
+      })
+      .sort((a, b) => a - b);
 
-  const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
+  const getNearestSection = () => {
+    const tops = getSectionTops();
+    if (!tops.length) return null;
+    const currentY = window.scrollY;
+    return tops.reduce((nearest, top) =>
+      Math.abs(top - currentY) < Math.abs(nearest - currentY) ? top : nearest
+    );
+  };
 
   const smoothScrollTo = (targetY: number) => {
-    if (isSnappingRef.current) return;
+    // Cancel any in-flight snap
+    if (cancelSnapRef.current) {
+      cancelSnapRef.current();
+      cancelSnapRef.current = null;
+    }
     isSnappingRef.current = true;
-    animate(window.scrollY, targetY, {
-      duration: 0.9,
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    const clamped = Math.min(Math.max(targetY, 0), maxScroll);
+    const controls = animate(window.scrollY, clamped, {
+      duration: 0.75,
       ease: "easeInOut",
       onUpdate: (latest) => window.scrollTo(0, latest),
       onComplete: () => {
         isSnappingRef.current = false;
+        cancelSnapRef.current = null;
       },
     });
+    cancelSnapRef.current = () => {
+      controls.stop();
+      isSnappingRef.current = false;
+    };
+  };
+
+  // Snap to nearest section immediately (no animation) — used on resize
+  const snapToNearestImmediate = () => {
+    if (cancelSnapRef.current) {
+      cancelSnapRef.current();
+      cancelSnapRef.current = null;
+    }
+    const nearest = getNearestSection();
+    if (nearest !== null) {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      window.scrollTo(0, Math.min(Math.max(nearest, 0), maxScroll));
+    }
+    isSnappingRef.current = false;
   };
 
   useEffect(() => {
-    const sections = ["about", "experience", "certifications", "technologies"];
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      isMobileRef.current = mobile;
+      setIsMobile(mobile);
+    };
+    checkMobile();
 
-    const handleWheel = (event: WheelEvent) => {
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      checkMobile();
+      // Debounce: wait until resize is settled before snapping
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        snapToNearestImmediate();
+      }, 120);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
+    };
+  // snapToNearestImmediate is stable (no deps) — safe to omit
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
+
+  // Wheel-based snapping (desktop)
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (isMobileRef.current) return;
       if (isSnappingRef.current) return;
 
-      const targetNode = event.target as HTMLElement | null;
-      if (targetNode?.closest("#certifications")) {
-        return;
-      }
+      const targetNode = e.target as HTMLElement | null;
+      if (targetNode?.closest("#certifications")) return;
 
-      const sectionEls = sections
-        .map((id) => document.getElementById(id))
-        .filter((el): el is HTMLElement => Boolean(el));
-      if (!sectionEls.length) return;
-
-      const sectionsWithBounds = sectionEls
-        .map((el) => {
-          const rect = el.getBoundingClientRect();
-          const top = rect.top + window.scrollY;
-          const bottom = top + rect.height;
-          return { el, top, bottom };
-        })
-        .sort((a, b) => a.top - b.top);
+      const tops = getSectionTops();
+      if (!tops.length) return;
 
       const currentY = window.scrollY;
-      const delta = event.deltaY;
-      const threshold = 140;
+      const threshold = 60;
 
-      const currentIndex = sectionsWithBounds.findIndex(
-        ({ top, bottom }) =>
-          currentY >= top - threshold && currentY < bottom - threshold,
-      );
-
-      if (currentIndex === -1) return;
-
-      const currentSection = sectionsWithBounds[currentIndex];
-
-      if (delta > 0) {
-        const isNearBottom =
-          currentY >= currentSection.bottom - window.innerHeight - threshold;
-        const next = sectionsWithBounds[currentIndex + 1];
-        if (isNearBottom && next) {
-          event.preventDefault();
-          smoothScrollTo(next.top);
+      if (e.deltaY > 0) {
+        const next = tops.find((top) => top > currentY + threshold);
+        if (next !== undefined) {
+          e.preventDefault();
+          smoothScrollTo(next);
         }
-      } else if (delta < 0) {
-        const isNearTop = currentY <= currentSection.top + threshold;
-        const prev = sectionsWithBounds[currentIndex - 1];
-        if (isNearTop && prev) {
-          event.preventDefault();
-          smoothScrollTo(prev.top);
+      } else if (e.deltaY < 0) {
+        const prev = [...tops].reverse().find((top) => top < currentY - threshold);
+        if (prev !== undefined) {
+          e.preventDefault();
+          smoothScrollTo(prev);
         }
       }
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
+  // getSectionTops / smoothScrollTo use only refs — safe to register once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Touch-based snapping (mobile)
+  useEffect(() => {
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let didSnap = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!isMobileRef.current) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+      didSnap = false;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!isMobileRef.current) return;
+      if (didSnap) return;
+
+      const targetNode = e.target as HTMLElement | null;
+      if (targetNode?.closest("#certifications")) return;
+
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+      const deltaX = touchStartX - e.changedTouches[0].clientX;
+
+      // Only snap on predominantly vertical swipes with enough distance
+      if (Math.abs(deltaX) > Math.abs(deltaY)) return;
+      if (Math.abs(deltaY) < 30) return;
+
+      if (isSnappingRef.current) return;
+
+      const tops = getSectionTops();
+      if (!tops.length) return;
+
+      const currentY = window.scrollY;
+      const threshold = 40;
+
+      if (deltaY > 0) {
+        // Swiped up → go to next section
+        const next = tops.find((top) => top > currentY + threshold);
+        if (next !== undefined) {
+          didSnap = true;
+          smoothScrollTo(next);
+        }
+      } else {
+        // Swiped down → go to previous section
+        const prev = [...tops].reverse().find((top) => top < currentY - threshold);
+        if (prev !== undefined) {
+          didSnap = true;
+          smoothScrollTo(prev);
+        }
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  // getSectionTops / smoothScrollTo use only refs — safe to register once
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
-        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
-        <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
-      </div>
+      <BannerBackground />
 
       <section
         id="about"
@@ -166,7 +265,7 @@ export default function About() {
               >
                 <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white/50 shadow-2xl">
                   <Image
-                    src="/Picture2.jpg"
+                    src="/Picture.jpg"
                     alt="Avatar"
                     fill
                     className="object-cover select-none"

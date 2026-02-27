@@ -270,34 +270,34 @@ export default function Footer() {
                   const isCurrentPage = pathname === linkPath;
 
                   return (
-                  <motion.div key={link.href} whileHover={{ x: 4 }}>
-                    <Link
-                      href={link.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (link.href === "/#contact") {
-                          openContactModal();
-                          return;
-                        }
-                        if (isCurrentPage) {
-                          if (hashId) {
-                            const el = document.getElementById(hashId);
-                            el?.scrollIntoView({ behavior: "smooth" });
-                          } else {
-                            window.scrollTo({ top: 0, behavior: "smooth" });
+                    <motion.div key={link.href} whileHover={{ x: 4 }}>
+                      <Link
+                        href={link.href}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (link.href === "/#contact") {
+                            openContactModal();
+                            return;
                           }
-                        } else {
-                          startTransition(link.href);
-                        }
-                      }}
-                      className="flex items-center gap-2 text-white/70 hover:text-white transition"
-                    >
-                      <span className="opacity-0 group-hover:opacity-100">
-                        →
-                      </span>
-                      {link.label}
-                    </Link>
-                  </motion.div>
+                          if (isCurrentPage) {
+                            if (hashId) {
+                              const el = document.getElementById(hashId);
+                              el?.scrollIntoView({ behavior: "smooth" });
+                            } else {
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }
+                          } else {
+                            startTransition(link.href);
+                          }
+                        }}
+                        className="flex items-center gap-2 text-white/70 hover:text-white transition"
+                      >
+                        <span className="opacity-0 group-hover:opacity-100">
+                          →
+                        </span>
+                        {link.label}
+                      </Link>
+                    </motion.div>
                   );
                 })}
               </nav>
@@ -390,10 +390,37 @@ export default function Footer() {
             className="flex flex-col md:flex-row items-center justify-between gap-6"
           >
             <p className="text-white/60 text-sm">
-              © 2026 Krennt Craven. All rights reserved.
+              © {new Date().getFullYear()} Krennt Craven. All rights reserved.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
+              {/* Scroll-to-top — desktop only, about & home pages */}
+              {(pathname === "/about" || pathname === "/") && (
+                <motion.button
+                  type="button"
+                  onClick={() => smoothScrollTo(0)}
+                  whileHover={{ y: -4, scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Scroll to top"
+                  className="hidden md:flex w-11 h-11 items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white/80 hover:text-white hover:bg-white/20 transition"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 15l7-7 7 7"
+                    />
+                  </svg>
+                </motion.button>
+              )}
+
               {socials
                 .filter((social) =>
                   ["Facebook", "LinkedIn"].includes(social.label),

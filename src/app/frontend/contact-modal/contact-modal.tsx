@@ -23,6 +23,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Close on outside click
@@ -92,19 +93,31 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
     }
 
     setIsSubmitting(true);
+    setSubmitError("");
 
-    // Simulate form submission (replace with actual API call)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong.");
+      }
 
-    // Reset form after showing success animation
-    setTimeout(() => {
-      setFormData({ name: "", email: "", message: "" });
-      setIsSubmitted(false);
-      onClose();
-    }, 2000);
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setFormData({ name: "", email: "", message: "" });
+        setIsSubmitted(false);
+        onClose();
+      }, 2000);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Failed to send. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -349,6 +362,17 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                         </motion.p>
                       )}
                     </motion.div>
+
+                    {/* Submit error */}
+                    {submitError && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs sm:text-sm text-red-600 text-center"
+                      >
+                        {submitError}
+                      </motion.p>
+                    )}
 
                     {/* Buttons */}
                     <motion.div

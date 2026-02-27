@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
+import { BannerBackground } from "../banner-background";
 import { usePageTransition } from "../page-transition/page-transition";
 
 // Define the Project type
@@ -43,12 +44,7 @@ export default function FeaturedProjectsClient({
 
   return (
     <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pb-24">
-      {/* Background decorations */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
-        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-black/5 via-transparent to-transparent" />
-        <div className="absolute inset-x-12 sm:inset-x-24 bottom-[-12rem] h-72 rounded-[36px] bg-black/5 blur-3xl" />
-      </div>
+      <BannerBackground />
 
       <section
         id="projects"
@@ -94,15 +90,15 @@ export default function FeaturedProjectsClient({
                 whileHover={{ y: -8, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={(e) => handleProjectClick(e, project.slug)}
-                className="group relative overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-slate-50 to-slate-100/70 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.55)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_70px_-30px_rgba(15,23,42,0.45)] cursor-pointer"
+                className="group relative overflow-hidden rounded-3xl border border-slate-200/70 bg-linear-to-br from-white via-slate-50 to-slate-100/70 shadow-[0_18px_60px_-35px_rgba(15,23,42,0.55)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_70px_-30px_rgba(15,23,42,0.45)] cursor-pointer"
               >
                 {/* Card shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/35 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                 <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/40" />
 
                 <div className="relative">
                   {/* Project Image */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-neutral-100 via-neutral-50 to-white">
+                  <div className="relative aspect-4/3 w-full overflow-hidden bg-linear-to-br from-neutral-100 via-neutral-50 to-white">
                     <div className="relative h-full w-full">
                       <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm">
                         Featured
@@ -118,7 +114,7 @@ export default function FeaturedProjectsClient({
                             quality={85}
                             loading="lazy"
                           />
-                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60" />
+                          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-60" />
                         </>
                       ) : (
                         <div className="flex h-full items-center justify-center">
