@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useContactModal } from "../contact-modal/contact-modal-context";
 import { usePageTransition } from "../page-transition/page-transition";
 
@@ -31,16 +31,27 @@ export default function NavigationBar() {
   const { startTransition } = usePageTransition();
   const pathname = usePathname();
 
+  const skipAnimations = useRef(
+    typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        navigator.maxTouchPoints > 0),
+  ).current;
+
   const backgroundColor = useTransform(
     scrollY,
     [0, 100],
-    ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.92)"],
+    skipAnimations
+      ? ["rgba(255, 255, 255, 0.92)", "rgba(255, 255, 255, 0.92)"]
+      : ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.92)"],
   );
 
   const boxShadow = useTransform(
     scrollY,
     [0, 100],
-    ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 12px 36px rgba(0, 0, 0, 0.12)"],
+    skipAnimations
+      ? ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 2px 10px rgba(0, 0, 0, 0.08)"]
+      : ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 12px 36px rgba(0, 0, 0, 0.12)"],
   );
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -112,15 +123,17 @@ export default function NavigationBar() {
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-tr from-white/15 to-transparent"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                  />
+                  {!skipAnimations && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-tr from-white/15 to-transparent"
+                      animate={{ rotate: [0, 360] }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    />
+                  )}
                   <Image
                     src={Logo}
                     alt="KC Logo"

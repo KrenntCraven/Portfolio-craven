@@ -1,6 +1,9 @@
-import type { Document } from "@contentful/rich-text-types";
+import "server-only";
 import type { Asset, EntryFieldTypes } from "contentful";
 import { createClient } from "contentful";
+import { unstable_cache } from "next/cache";
+export type { Project } from "./types";
+import type { Project } from "./types";
 
 const client = createClient({
   space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID!,
@@ -10,7 +13,6 @@ const client = createClient({
 
 const PROJECT_TYPE = "featuredProjects" as const;
 
-// Entry Skeleton Types
 interface ProjectEntryFields {
   title: EntryFieldTypes.Text;
   slug: EntryFieldTypes.Text;
@@ -37,79 +39,57 @@ interface ProjectEntrySkeleton {
   fields: ProjectEntryFields;
 }
 
-export type Project = {
-  id: string;
-  title: string;
-  slug: string;
-  headline?: string;
-  imageUrl?: string;
-  coverPageUrl?: string;
-  projectType?: string[];
-  keyFeatures?: string[];
-  role?: string;
-  technologies?: string[];
-  order?: number;
-  githubLink?: string;
-  siteLink?: string;
-  caseStudy?: Document;
-  problemCaseStudy?: Document;
-  solutionCaseStudy?: Document;
-  technicalCaseStudy?: Document;
-  impactOutcomeCaseStudy?: Document;
-  challengesLearningsCaseStudy?: Document;
-};
-
-// Helper function to check if asset is resolved
 function isAsset(asset: any): asset is Asset {
   return asset && "fields" in asset;
 }
 
-export async function getFeaturedProjects(): Promise<Project[]> {
+async function _getFeaturedProjects(): Promise<Project[]> {
   const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
     order: ["fields.order"],
   });
 
   return entries.items
-    .map((item) => {
-      return {
-        id: item.sys.id,
-        title: item.fields.title ?? "Untitled",
-        slug: item.fields.slug ?? "",
-        headline: item.fields.headline,
-        imageUrl:
-          item.fields.heroImage &&
-          isAsset(item.fields.heroImage) &&
-          item.fields.heroImage.fields?.file?.url
-            ? `https:${item.fields.heroImage.fields.file.url}`
-            : undefined,
-        coverPageUrl:
-          item.fields.coverPage &&
-          isAsset(item.fields.coverPage) &&
-          item.fields.coverPage.fields?.file?.url
-            ? `https:${item.fields.coverPage.fields.file.url}`
-            : undefined,
-        projectType: item.fields.projectType,
-        keyFeatures: item.fields.keyFeatures || [],
-        role: item.fields.role,
-        // Case Study fields
-        caseStudy: item.fields.caseStudy,
-        problemCaseStudy: item.fields.problemCaseStudy,
-        solutionCaseStudy: item.fields.solutionCaseStudy,
-        technicalCaseStudy: item.fields.technicalCaseStudy,
-        impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
-        challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
-
-        // Links
-        githubLink: item.fields.githubLink,
-        siteLink: item.fields.siteLink,
-        order: item.fields.order,
-      };
-    })
+    .map((item) => ({
+      id: item.sys.id,
+      title: item.fields.title ?? "Untitled",
+      slug: item.fields.slug ?? "",
+      headline: item.fields.headline,
+      imageUrl:
+        item.fields.heroImage &&
+        isAsset(item.fields.heroImage) &&
+        item.fields.heroImage.fields?.file?.url
+          ? `https:${item.fields.heroImage.fields.file.url}`
+          : undefined,
+      coverPageUrl:
+        item.fields.coverPage &&
+        isAsset(item.fields.coverPage) &&
+        item.fields.coverPage.fields?.file?.url
+          ? `https:${item.fields.coverPage.fields.file.url}`
+          : undefined,
+      projectType: item.fields.projectType,
+      keyFeatures: item.fields.keyFeatures || [],
+      role: item.fields.role,
+      caseStudy: item.fields.caseStudy,
+      problemCaseStudy: item.fields.problemCaseStudy,
+      solutionCaseStudy: item.fields.solutionCaseStudy,
+      technicalCaseStudy: item.fields.technicalCaseStudy,
+      impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
+      challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
+      githubLink: item.fields.githubLink,
+      siteLink: item.fields.siteLink,
+      order: item.fields.order,
+    }))
     .filter((p) => p.slug);
 }
 
-export async function getProjectBySlug(slug: string): Promise<Project | null> {
+export const getFeaturedProjects = unstable_cache(
+  _getFeaturedProjects,
+  ["featured-projects"],
+  { revalidate: 3600, tags: ["featured-projects"] },
+);
+
+async function _getProjectBySlug(slug: string): Promise<Project | null> {
   const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
     "fields.slug": slug,
@@ -118,6 +98,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 
   const item = entries.items[0];
   if (!item) return null;
+
   return {
     id: item.sys.id,
     title: item.fields.title ?? "Untitled",
@@ -138,14 +119,12 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     projectType: item.fields.projectType,
     keyFeatures: item.fields.keyFeatures || [],
     role: item.fields.role,
-    // Case Study fields
     caseStudy: item.fields.caseStudy,
     problemCaseStudy: item.fields.problemCaseStudy,
     solutionCaseStudy: item.fields.solutionCaseStudy,
     technicalCaseStudy: item.fields.technicalCaseStudy,
     impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
     challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
-    // Links
     siteLink: item.fields.siteLink,
     technologies: item.fields.technologies,
     githubLink: item.fields.githubLink,
@@ -153,7 +132,14 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
   };
 }
 
-// Resume content model types
+export function getProjectBySlug(slug: string): Promise<Project | null> {
+  return unstable_cache(
+    () => _getProjectBySlug(slug),
+    [`project-${slug}`],
+    { revalidate: 3600, tags: [`project-${slug}`, "projects"] },
+  )();
+}
+
 interface ResumeEntryFields {
   resumeFile: EntryFieldTypes.AssetLink;
 }
@@ -163,7 +149,7 @@ interface ResumeEntrySkeleton {
   fields: ResumeEntryFields;
 }
 
-export async function getResumeUrl(): Promise<string | null> {
+async function _getResumeUrl(): Promise<string | null> {
   const entries = await client.getEntries<ResumeEntrySkeleton>({
     content_type: "resume",
     limit: 1,
@@ -177,5 +163,11 @@ export async function getResumeUrl(): Promise<string | null> {
 
   return `https:${file.fields.file.url}`;
 }
+
+export const getResumeUrl = unstable_cache(
+  _getResumeUrl,
+  ["resume-url"],
+  { revalidate: 3600, tags: ["resume"] },
+);
 
 export default client;

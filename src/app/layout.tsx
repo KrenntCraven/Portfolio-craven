@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ContactModalProvider } from "./frontend/contact-modal/contact-modal-context";
-import Footer from "./frontend/footer/footer";
+import FooterLazy from "./frontend/footer/footer-lazy";
 import NavigationBar from "./frontend/navigation-bar/navbar";
 import { PageTransitionProvider } from "./frontend/page-transition/page-transition";
 import "./globals.css";
@@ -34,7 +34,7 @@ export default function RootLayout({
           <ContactModalProvider>
             <NavigationBar />
             <main className="flex-1">{children}</main>
-            <Footer />
+            <FooterLazy />
           </ContactModalProvider>
         </PageTransitionProvider>
       </body>

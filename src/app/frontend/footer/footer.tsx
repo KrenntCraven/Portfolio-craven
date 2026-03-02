@@ -34,6 +34,13 @@ export default function Footer() {
   const { startTransition } = usePageTransition();
   const { open: openContactModal } = useContactModal();
 
+  const skipAnimations = useRef(
+    typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        navigator.maxTouchPoints > 0),
+  ).current;
+
   const smoothScrollTo = (targetY: number) => {
     if (isSnappingRef.current) return;
     isSnappingRef.current = true;
@@ -49,6 +56,8 @@ export default function Footer() {
   };
 
   useEffect(() => {
+    if (skipAnimations) return;
+
     gsap.registerPlugin(ScrollTrigger);
 
     const down = "M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z";
@@ -124,6 +133,8 @@ export default function Footer() {
     const isAbout = pathname === "/about";
     const isCaseStudy = pathname.includes("/casestudy");
     if (!isHome && !isAbout && !isCaseStudy) return;
+    // Skip scroll-snapping on touch devices — native momentum scrolling handles it
+    if (skipAnimations) return;
 
     const handleWheel = (event: WheelEvent) => {
       if (isSnappingRef.current) return;
