@@ -3,19 +3,30 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import type { Document } from "@contentful/rich-text-types";
 import { animate, motion } from "framer-motion";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import type { Project } from "../../../backend/types";
 import { BannerBackground } from "../../../frontend/banner-background";
 import { usePageTransition } from "../../../frontend/page-transition/page-transition";
-import type { Project } from "../../../backend/types";
 
 const SECTION_CONFIG: { id: string; field: keyof Project; label: string }[] = [
   { id: "case-study-content", field: "caseStudy", label: "" },
   { id: "problem-case-study", field: "problemCaseStudy", label: "Problem" },
   { id: "solution-case-study", field: "solutionCaseStudy", label: "Solution" },
-  { id: "technical-case-study", field: "technicalCaseStudy", label: "Technical approach" },
-  { id: "impact-outcome-case-study", field: "impactOutcomeCaseStudy", label: "Impact & outcome" },
-  { id: "challenges-learnings-case-study", field: "challengesLearningsCaseStudy", label: "Challenges & learnings" },
+  {
+    id: "technical-case-study",
+    field: "technicalCaseStudy",
+    label: "Technical approach",
+  },
+  {
+    id: "impact-outcome-case-study",
+    field: "impactOutcomeCaseStudy",
+    label: "Impact & outcome",
+  },
+  {
+    id: "challenges-learnings-case-study",
+    field: "challengesLearningsCaseStudy",
+    label: "Challenges & learnings",
+  },
 ];
 
 const PROSE_CLASS =
@@ -36,43 +47,26 @@ function CaseStudySection({
       id={id}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay: 0.1 }}
-      className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16 min-h-screen md:min-h-[80vh] flex items-center"
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.5 }}
+      className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20 md:min-h-[80vh] md:flex md:items-center"
     >
       <div className="mx-auto max-w-3xl w-full">
         {label && (
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8 sm:mb-10"
-          >
+          <div className="mb-8 sm:mb-10">
             <div className="flex items-center gap-3 mb-4">
-              <motion.div
-                className="h-1 w-12 rounded-full bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              />
-              <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">{label}</span>
+              <div className="h-1 w-12 rounded-full bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]" />
+              <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">
+                {label}
+              </span>
             </div>
-            <h2 className="text-2xl font-bold text-neutral-800 sm:text-3xl lg:text-4xl tracking-tight">{label}</h2>
-          </motion.div>
+            <h2 className="text-2xl font-bold text-neutral-800 sm:text-3xl lg:text-4xl tracking-tight">
+              {label}
+            </h2>
+          </div>
         )}
-        <div className="relative">
-          <div className="absolute -inset-4 sm:-inset-6 rounded-2xl bg-linear-to-br from-white via-neutral-50/50 to-white opacity-60 blur-xl" />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="relative rounded-2xl bg-white/80 backdrop-blur-sm border border-neutral-200/50 p-6 sm:p-8 lg:p-10 shadow-sm"
-          >
-            <div className={PROSE_CLASS}>{children}</div>
-          </motion.div>
+        <div className="relative rounded-2xl bg-white border border-neutral-200/50 p-6 sm:p-8 lg:p-10 shadow-sm">
+          <div className={PROSE_CLASS}>{children}</div>
         </div>
       </div>
     </motion.section>
@@ -81,7 +75,9 @@ function CaseStudySection({
 
 export default function CaseStudyPageClient({ project }: { project: Project }) {
   const slug = project.slug;
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useRef(
+    typeof window !== "undefined" && window.innerWidth < 768,
+  ).current;
   const isSnappingRef = useRef(false);
   const { startTransition } = usePageTransition();
 
@@ -94,16 +90,11 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
       duration: 0.8,
       ease: "easeInOut",
       onUpdate: (latest) => window.scrollTo(0, latest),
-      onComplete: () => { isSnappingRef.current = false; },
+      onComplete: () => {
+        isSnappingRef.current = false;
+      },
     });
   };
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -122,7 +113,10 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
       Array.from(document.querySelectorAll<HTMLElement>("section[id]"))
         .map((el) => {
           const rawTop = el.getBoundingClientRect().top + window.scrollY;
-          return Math.min(rawTop - NAV_OFFSET, document.body.scrollHeight - window.innerHeight);
+          return Math.min(
+            rawTop - NAV_OFFSET,
+            document.body.scrollHeight - window.innerHeight,
+          );
         })
         .sort((a, b) => a - b);
 
@@ -134,10 +128,18 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
       const threshold = 60;
       if (e.deltaY > 0) {
         const next = tops.find((top) => top > currentY + threshold);
-        if (next !== undefined) { e.preventDefault(); smoothScrollTo(next); }
+        if (next !== undefined) {
+          e.preventDefault();
+          smoothScrollTo(next);
+        }
       } else if (e.deltaY < 0) {
-        const prev = [...tops].reverse().find((top) => top < currentY - threshold);
-        if (prev !== undefined) { e.preventDefault(); smoothScrollTo(prev); }
+        const prev = [...tops]
+          .reverse()
+          .find((top) => top < currentY - threshold);
+        if (prev !== undefined) {
+          e.preventDefault();
+          smoothScrollTo(prev);
+        }
       }
     };
 
@@ -159,23 +161,35 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
         >
-          <Link
-            href={`/projects/${slug}`}
+          <button
+            type="button"
+            onClick={() => startTransition(`/projects/${slug}`)}
             className="group inline-flex w-full items-center justify-center gap-3 rounded-xl border border-neutral-300 bg-white/80 px-4 py-2.5 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:shadow-md active:translate-y-0 sm:w-auto sm:text-base sm:px-5 sm:py-3"
           >
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 transition-transform group-hover:-translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to project
-          </Link>
+          </button>
         </motion.div>
       </div>
 
       {/* Hero section */}
-      <section id="hero-section" className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:pt-16 lg:pb-12 min-h-screen flex items-center">
+      <section
+        id="hero-section"
+        className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:pt-24 lg:pb-16 md:min-h-screen md:flex md:items-center"
+      >
         <div className="mx-auto max-w-3xl w-full">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -188,7 +202,9 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
               <div className="h-2 w-2 rounded-full bg-[#6c5ce7]/60" />
               <div className="h-2 w-2 rounded-full bg-[#6c5ce7]/30" />
             </div>
-            <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">Case Study</span>
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">
+              Case Study
+            </span>
           </motion.div>
 
           <motion.h1
@@ -207,8 +223,18 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
             className="flex items-center gap-4 text-sm text-neutral-600"
           >
             <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-[#6c5ce7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="h-5 w-5 text-[#6c5ce7]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               <span className="font-medium">In-depth analysis</span>
             </div>
@@ -248,20 +274,37 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(108,92,231,0.06),transparent_60%)]" />
               <div className="relative z-10">
                 <div className="flex items-center justify-center gap-3 mb-6">
-                  <motion.div className="h-1 w-10 rounded-full bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} />
-                  <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">Like what you see?</span>
-                  <motion.div className="h-1 w-10 rounded-full bg-linear-to-r from-[#a29bfe] to-[#6c5ce7]" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} />
+                  <div className="h-1 w-10 rounded-full bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]" />
+                  <span className="text-sm font-semibold uppercase tracking-wider text-[#6c5ce7]">
+                    Like what you see?
+                  </span>
+                  <div className="h-1 w-10 rounded-full bg-linear-to-r from-[#a29bfe] to-[#6c5ce7]" />
                 </div>
-                <h3 className="text-2xl font-bold text-neutral-800 sm:text-3xl mb-4 tracking-tight">Interested in this project?</h3>
-                <p className="text-neutral-500 mb-8 max-w-xl mx-auto leading-relaxed">Let&apos;s discuss how we can work together on your next project</p>
+                <h3 className="text-2xl font-bold text-neutral-800 sm:text-3xl mb-4 tracking-tight">
+                  Interested in this project?
+                </h3>
+                <p className="text-neutral-500 mb-8 max-w-xl mx-auto leading-relaxed">
+                  Let&apos;s discuss how we can work together on your next
+                  project
+                </p>
                 <button
                   type="button"
                   onClick={() => startTransition(`/projects/${slug}`)}
                   className="inline-flex items-center gap-2 rounded-xl border border-[#6c5ce7]/30 bg-[#6c5ce7]/5 px-6 py-3 text-base font-semibold text-[#6c5ce7] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#6c5ce7]/50 hover:bg-[#6c5ce7]/10 hover:shadow-md active:translate-y-0"
                 >
                   View full project
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
                   </svg>
                 </button>
               </div>

@@ -245,7 +245,18 @@ export default function Footer() {
               viewport={{ once: true }}
               className="flex flex-col gap-4"
             >
-              <Link href="/" className="w-fit">
+              <Link
+                href="/"
+                className="w-fit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (pathname !== "/") {
+                    startTransition("/");
+                  } else {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+              >
                 <motion.div
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   whileTap={{ scale: 0.95 }}

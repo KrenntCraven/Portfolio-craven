@@ -1,23 +1,25 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 function useIsTouch() {
-  const isTouch = useRef(
-    typeof window !== "undefined" &&
-      (window.matchMedia("(pointer: coarse)").matches ||
-        navigator.maxTouchPoints > 0),
-  );
-  return isTouch.current;
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    setIsTouch(
+      window.matchMedia("(pointer: coarse)").matches ||
+        navigator.maxTouchPoints > 0,
+    );
+  }, []);
+  return isTouch;
 }
 
 function useReducedMotion() {
-  const reduced = useRef(
-    typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-  return reduced.current;
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
+  return reduced;
 }
 
 /**

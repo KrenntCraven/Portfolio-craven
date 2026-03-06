@@ -6,6 +6,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -32,6 +33,9 @@ export function PageTransitionProvider({
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
   const nextHrefRef = useRef<string | null>(null);
+  // Guard ref: prevents both the animation callback and the deadline timeout from
+  // advancing the phase simultaneously (whichever fires first "wins").
+  const phaseAdvancedRef = useRef(false);
 
   const skipHeavyAnimation = useRef(
     typeof window !== "undefined" &&
@@ -54,7 +58,33 @@ export function PageTransitionProvider({
     [disableOnPaths, phase, router],
   );
 
+  // Deadline safety-net: if the animation callback never fires (can happen in
+  // production with framer-motion WAAPI path animations), force-advance the phase
+  // so the dark overlay never stays on screen permanently.
+  useEffect(() => {
+    phaseAdvancedRef.current = false; // reset guard whenever phase changes
+    if (phase === "idle") return;
+
+    const deadline = phase === "cover" ? 900 : 700;
+    const timer = setTimeout(() => {
+      if (phaseAdvancedRef.current) return;
+      phaseAdvancedRef.current = true;
+      if (phase === "cover") {
+        const nextHref = nextHrefRef.current;
+        if (nextHref) router.push(nextHref);
+        setPhase("reveal");
+      } else if (phase === "reveal") {
+        nextHrefRef.current = null;
+        setPhase("idle");
+      }
+    }, deadline);
+    return () => clearTimeout(timer);
+  }, [phase, router]);
+
   const handleAnimationComplete = useCallback(() => {
+    if (phaseAdvancedRef.current) return; // deadline already fired
+    phaseAdvancedRef.current = true;
+
     if (phase === "cover") {
       const nextHref = nextHrefRef.current;
       if (nextHref) {
@@ -146,8 +176,11 @@ export function PageTransitionProvider({
               preserveAspectRatio="none"
             >
               <defs>
+                {/* Hard-coded hex instead of CSS var() — paint-server attributes
+                    don't reliably resolve CSS variables in all browsers. */}
                 <linearGradient id="page-transition-gradient" x1="0" y1="0" x2="99" y2="99" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.2" stopColor="var(--color-neutral-900)" />
+                  <stop offset="0" stopColor="#171717" />
+                  <stop offset="1" stopColor="#262626" />
                 </linearGradient>
               </defs>
               <motion.path

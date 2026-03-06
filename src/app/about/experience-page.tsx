@@ -1,21 +1,42 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { BannerBackground } from "../frontend/banner-background";
 import { experiences, experiencesMobile } from "./experiences-data";
 
+// Defined outside the component so it is never recreated on re-renders.
+// Uses "100%" instead of a large pixel value so the browser composite
+// layer only needs to cover the actual element width, not an off-screen
+// 1000 px canvas — much cheaper on mobile GPUs.
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? "-100%" : "100%",
+    opacity: 0,
+  }),
+};
+
 export default function ExperiencePage() {
+  // false matches the SSR output → no hydration mismatch.
+  // useLayoutEffect fires synchronously before the first paint so there
+  // is no visible flash when a mobile client corrects the value.
   const [isMobile, setIsMobile] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 640px)");
-    setIsMobile(mediaQuery.matches);
-
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
   const data = isMobile ? experiencesMobile : experiences;
@@ -28,21 +49,6 @@ export default function ExperiencePage() {
   const handleDotClick = (index: number) => {
     setDirection(index > currentIndex ? 1 : -1);
     setCurrentIndex(index);
-  };
-
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction > 0 ? -1000 : 1000,
-      opacity: 0,
-    }),
   };
 
   return (
@@ -86,14 +92,18 @@ export default function ExperiencePage() {
                   onClick={handleNext}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.995 }}
-                  className="group relative w-full cursor-pointer text-left max-w-4xl overflow-hidden rounded-2xl border border-neutral-200/70 bg-white/80 p-6 shadow-[0_18px_60px_-24px_rgba(15,23,42,0.25)] backdrop-blur-sm transition-all duration-300 hover:border-[#6c5ce7]/20 hover:shadow-[0_24px_70px_-22px_rgba(108,92,231,0.2)] sm:p-8 lg:p-10"
+                  className={`group relative w-full cursor-pointer text-left max-w-4xl overflow-hidden rounded-2xl border border-neutral-200/70 bg-white/80 p-6 shadow-[0_18px_60px_-24px_rgba(15,23,42,0.25)] transition-all duration-300 hover:border-[#6c5ce7]/20 hover:shadow-[0_24px_70px_-22px_rgba(108,92,231,0.2)] sm:p-8 lg:p-10 ${!isMobile ? "backdrop-blur-sm" : ""}`}
                   aria-label="Next experience"
                 >
-                  {/* Subtle hover gradient */}
-                  <div className="absolute inset-0 bg-linear-to-br from-[#6c5ce7]/0 via-transparent to-[#6c5ce7]/0 opacity-0 transition-opacity duration-300 group-hover:opacity-[0.06]" />
+                  {/* Subtle hover gradient — desktop only */}
+                  {!isMobile && (
+                    <div className="absolute inset-0 bg-linear-to-br from-[#6c5ce7]/0 via-transparent to-[#6c5ce7]/0 opacity-0 transition-opacity duration-300 group-hover:opacity-[0.06]" />
+                  )}
 
-                  {/* Card shine on hover */}
-                  <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+                  {/* Card shine on hover — desktop only (hover doesn't fire on touch) */}
+                  {!isMobile && (
+                    <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+                  )}
 
                   <div className="relative">
                     {/* Company and Period */}

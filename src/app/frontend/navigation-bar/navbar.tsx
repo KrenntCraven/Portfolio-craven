@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useContactModal } from "../contact-modal/contact-modal-context";
 import { usePageTransition } from "../page-transition/page-transition";
 
@@ -31,27 +31,26 @@ export default function NavigationBar() {
   const { startTransition } = usePageTransition();
   const pathname = usePathname();
 
-  const skipAnimations = useRef(
-    typeof window !== "undefined" &&
-      (window.matchMedia("(pointer: coarse)").matches ||
+  const [skipAnimations, setSkipAnimations] = useState(false);
+
+  useEffect(() => {
+    setSkipAnimations(
+      window.matchMedia("(pointer: coarse)").matches ||
         window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        navigator.maxTouchPoints > 0),
-  ).current;
+        navigator.maxTouchPoints > 0,
+    );
+  }, []);
 
   const backgroundColor = useTransform(
     scrollY,
     [0, 100],
-    skipAnimations
-      ? ["rgba(255, 255, 255, 0.92)", "rgba(255, 255, 255, 0.92)"]
-      : ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.92)"],
+    ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.92)"],
   );
 
   const boxShadow = useTransform(
     scrollY,
     [0, 100],
-    skipAnimations
-      ? ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 2px 10px rgba(0, 0, 0, 0.08)"]
-      : ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 12px 36px rgba(0, 0, 0, 0.12)"],
+    ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 12px 36px rgba(0, 0, 0, 0.12)"],
   );
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -345,7 +344,6 @@ export default function NavigationBar() {
           </motion.div>
         </div>
       </motion.div>
-
     </>
   );
 }
