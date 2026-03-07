@@ -92,7 +92,7 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
   ) as { id: string; field: keyof Project; label: string }[];
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-white text-neutral-800">
+    <main className="relative min-h-screen overflow-x-clip bg-white text-neutral-800">
       <BannerBackground />
 
       {/* Back button */}
