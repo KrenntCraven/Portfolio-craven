@@ -4,13 +4,12 @@ import {
   motion,
   useMotionValueEvent,
   useScroll,
-  useTransform,
 } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useContactModal } from "../contact-modal/contact-modal-context";
 import { usePageTransition } from "../page-transition/page-transition";
 
@@ -26,36 +25,16 @@ const navLinks = [
 export default function NavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { open: openContactModal } = useContactModal();
   const { scrollY } = useScroll();
   const { startTransition } = usePageTransition();
   const pathname = usePathname();
 
-  const [skipAnimations, setSkipAnimations] = useState(false);
-
-  useEffect(() => {
-    setSkipAnimations(
-      window.matchMedia("(pointer: coarse)").matches ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        navigator.maxTouchPoints > 0,
-    );
-  }, []);
-
-  const backgroundColor = useTransform(
-    scrollY,
-    [0, 100],
-    ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.92)"],
-  );
-
-  const boxShadow = useTransform(
-    scrollY,
-    [0, 100],
-    ["0 2px 10px rgba(0, 0, 0, 0.08)", "0 12px 36px rgba(0, 0, 0, 0.12)"],
-  );
-
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const isNearTop = latest <= 8;
-    setIsHidden(!isNearTop);
+    const scrolled = latest > 8;
+    setIsScrolled(scrolled);
+    setIsHidden(scrolled);
   });
 
   const smoothScrollTo = (targetY: number) => {
@@ -93,8 +72,11 @@ export default function NavigationBar() {
   return (
     <>
       <motion.nav
-        style={{ backgroundColor, boxShadow }}
-        className="fixed top-2 sm:top-3 md:top-4 left-1/2 z-50 w-[95vw] -translate-x-1/2 rounded-xl sm:rounded-2xl border border-black/6 backdrop-blur-2xl transition-all duration-300 shadow-lg shadow-black/10"
+        className={`fixed top-2 sm:top-3 md:top-4 left-1/2 z-50 w-[95vw] -translate-x-1/2 rounded-xl sm:rounded-2xl border border-black/6 backdrop-blur-sm md:backdrop-blur-2xl transition-[background-color,box-shadow] duration-300 ${
+          isScrolled
+            ? "bg-white/92 shadow-[0_12px_36px_-4px_rgba(0,0,0,0.12)]"
+            : "bg-white/72 shadow-[0_2px_10px_rgba(0,0,0,0.08)]"
+        }`}
         initial={{ y: -100 }}
         animate={{ y: isHidden ? -120 : 0 }}
         transition={{
@@ -122,17 +104,6 @@ export default function NavigationBar() {
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  {!skipAnimations && (
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-tr from-white/15 to-transparent"
-                      animate={{ rotate: [0, 360] }}
-                      transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                    />
-                  )}
                   <Image
                     src={Logo}
                     alt="KC Logo"

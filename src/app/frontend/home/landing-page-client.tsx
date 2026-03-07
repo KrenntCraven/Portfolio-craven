@@ -134,8 +134,8 @@ export default function LandingPageClient({
               aria-hidden
             />
             <motion.span
-              initial={{ maxWidth: "0ch" }}
-              animate={{ maxWidth: "40ch" }}
+              initial={{ clipPath: "inset(0 100% 0 0)" }}
+              animate={{ clipPath: "inset(0 0% 0 0)" }}
               transition={{ duration: 1.6, ease: "easeInOut", delay: 0.1 }}
               className="overflow-hidden whitespace-nowrap border-r border-neutral-800/60 pr-1"
             >

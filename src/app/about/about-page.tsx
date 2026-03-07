@@ -104,6 +104,9 @@ export default function About() {
     let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       checkMobile();
+      // Only snap on desktop — on mobile the browser fires resize when the
+      // address bar hides/shows during scroll, which would snap users back to top.
+      if (isMobileRef.current) return;
       // Debounce: wait until resize is settled before snapping
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
@@ -116,8 +119,6 @@ export default function About() {
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);
     };
-    // snapToNearestImmediate is stable (no deps) — safe to omit
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
@@ -156,12 +157,7 @@ export default function About() {
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-    // getSectionTops / smoothScrollTo use only refs — safe to register once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Mobile touch snapping intentionally omitted.
-  // touchend fires after the browser has already started native momentum
   // scroll, so any JS-driven snap competes with it and produces jank.
   // Mobile users get smooth native scroll; desktop keeps wheel snapping.
 

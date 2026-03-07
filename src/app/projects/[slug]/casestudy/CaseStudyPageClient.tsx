@@ -2,8 +2,8 @@
 
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import type { Document } from "@contentful/rich-text-types";
-import { animate, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useEffect } from "react";
 import type { Project } from "../../../backend/types";
 import { BannerBackground } from "../../../frontend/banner-background";
 import { usePageTransition } from "../../../frontend/page-transition/page-transition";
@@ -75,26 +75,7 @@ function CaseStudySection({
 
 export default function CaseStudyPageClient({ project }: { project: Project }) {
   const slug = project.slug;
-  const isMobile = useRef(
-    typeof window !== "undefined" && window.innerWidth < 768,
-  ).current;
-  const isSnappingRef = useRef(false);
   const { startTransition } = usePageTransition();
-
-  const smoothScrollTo = (targetY: number) => {
-    if (isSnappingRef.current) return;
-    isSnappingRef.current = true;
-    const maxScroll = document.body.scrollHeight - window.innerHeight;
-    const clamped = Math.min(targetY, maxScroll);
-    animate(window.scrollY, clamped, {
-      duration: 0.8,
-      ease: "easeInOut",
-      onUpdate: (latest) => window.scrollTo(0, latest),
-      onComplete: () => {
-        isSnappingRef.current = false;
-      },
-    });
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -105,47 +86,6 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
     }, 100);
     return () => clearTimeout(t);
   }, [slug]);
-
-  useEffect(() => {
-    if (isMobile) return;
-    const NAV_OFFSET = 80;
-    const getSectionTops = () =>
-      Array.from(document.querySelectorAll<HTMLElement>("section[id]"))
-        .map((el) => {
-          const rawTop = el.getBoundingClientRect().top + window.scrollY;
-          return Math.min(
-            rawTop - NAV_OFFSET,
-            document.body.scrollHeight - window.innerHeight,
-          );
-        })
-        .sort((a, b) => a - b);
-
-    const handleWheel = (e: WheelEvent) => {
-      if (isSnappingRef.current) return;
-      const tops = getSectionTops();
-      if (!tops.length) return;
-      const currentY = window.scrollY;
-      const threshold = 60;
-      if (e.deltaY > 0) {
-        const next = tops.find((top) => top > currentY + threshold);
-        if (next !== undefined) {
-          e.preventDefault();
-          smoothScrollTo(next);
-        }
-      } else if (e.deltaY < 0) {
-        const prev = [...tops]
-          .reverse()
-          .find((top) => top < currentY - threshold);
-        if (prev !== undefined) {
-          e.preventDefault();
-          smoothScrollTo(prev);
-        }
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleWheel);
-  }, [isMobile]);
 
   const sectionsToRender = SECTION_CONFIG.filter(
     (s) => project[s.field] && typeof project[s.field] === "object",

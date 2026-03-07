@@ -76,36 +76,43 @@ export function BannerBackground() {
       <div className="landing-banner-base absolute inset-0" />
       <div className="absolute inset-x-0 top-0 h-64 bg-linear-to-b from-black/10 via-transparent to-transparent dark:from-white/5" />
 
-      <motion.div
-        className="absolute left-[10%] top-[18%] h-[320px] w-[320px] rounded-full opacity-90 dark:opacity-85"
-        style={skip ? undefined : { x: orb1X, y: orb1Y }}
-      >
-        <div className="landing-banner-orb-purple-1 h-full w-full rounded-full blur-3xl" />
-      </motion.div>
-      <motion.div
-        className="absolute right-[5%] top-[25%] h-[280px] w-[280px] rounded-full opacity-85"
-        style={skip ? undefined : { x: orb2X, y: orb2Y }}
-      >
-        <div className="landing-banner-orb-neutral h-full w-full rounded-full blur-3xl" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[20%] left-[15%] h-[240px] w-[240px] rounded-full opacity-90"
-        style={skip ? undefined : { x: orb3X, y: orb3Y }}
-      >
-        <div className="landing-banner-orb-purple-2 h-full w-full rounded-full blur-3xl" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[15%] right-[12%] h-[360px] w-[360px] rounded-full opacity-80"
-        style={skip ? undefined : { x: orb4X, y: orb4Y }}
-      >
-        <div className="landing-banner-orb-neutral-2 h-full w-full rounded-full blur-3xl" />
-      </motion.div>
-      <motion.div
-        className="absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-80"
-        style={skip ? undefined : { x: orb5X, y: orb5Y }}
-      >
-        <div className="landing-banner-orb-purple-3 h-full w-full rounded-full blur-2xl" />
-      </motion.div>
+      {/* On mobile/touch: no blurred orbs — the CSS gradient is sufficient and
+          blur compositing at 120Hz on ProMotion devices tanks GPU fill rate */}
+      {skip ? null : (
+        <>
+          {/* Desktop: 5 mouse-tracked orbs, each on its own compositor layer */}
+          <motion.div
+            className="absolute left-[10%] top-[18%] h-[320px] w-[320px] rounded-full opacity-90 dark:opacity-85"
+            style={{ x: orb1X, y: orb1Y, willChange: "transform" }}
+          >
+            <div className="landing-banner-orb-purple-1 h-full w-full rounded-full blur-3xl" />
+          </motion.div>
+          <motion.div
+            className="absolute right-[5%] top-[25%] h-[280px] w-[280px] rounded-full opacity-85"
+            style={{ x: orb2X, y: orb2Y, willChange: "transform" }}
+          >
+            <div className="landing-banner-orb-neutral h-full w-full rounded-full blur-3xl" />
+          </motion.div>
+          <motion.div
+            className="absolute bottom-[20%] left-[15%] h-[240px] w-[240px] rounded-full opacity-90"
+            style={{ x: orb3X, y: orb3Y, willChange: "transform" }}
+          >
+            <div className="landing-banner-orb-purple-2 h-full w-full rounded-full blur-3xl" />
+          </motion.div>
+          <motion.div
+            className="absolute bottom-[15%] right-[12%] h-[360px] w-[360px] rounded-full opacity-80"
+            style={{ x: orb4X, y: orb4Y, willChange: "transform" }}
+          >
+            <div className="landing-banner-orb-neutral-2 h-full w-full rounded-full blur-3xl" />
+          </motion.div>
+          <motion.div
+            className="absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-80"
+            style={{ x: orb5X, y: orb5Y, willChange: "transform" }}
+          >
+            <div className="landing-banner-orb-purple-3 h-full w-full rounded-full blur-2xl" />
+          </motion.div>
+        </>
+      )}
 
       <div className="absolute inset-x-12 sm:inset-x-24 -bottom-48 h-72 rounded-[36px] bg-black/5 blur-3xl dark:bg-white/5" />
     </div>
