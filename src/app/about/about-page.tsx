@@ -3,11 +3,25 @@ import { animate, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import dynamic from "next/dynamic";
 import { BannerBackground } from "../frontend/banner-background";
 import { aboutMobileParagraphs, aboutParagraphs } from "./about-data";
-import Certification from "./certification-page";
-import ExperiencePage from "./experience-page";
-import { Technologies } from "./techonologies-page";
+
+const ExperiencePage = dynamic(() => import("./experience-page"), {
+  loading: () => <div className="min-h-screen" />,
+});
+
+const Certification = dynamic(() => import("./certification-page"), {
+  loading: () => <div className="min-h-screen" />,
+});
+
+const Technologies = dynamic(
+  () =>
+    import("./techonologies-page").then((mod) => ({
+      default: mod.Technologies,
+    })),
+  { loading: () => <div className="min-h-100" /> },
+);
 
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
@@ -37,7 +51,7 @@ export default function About() {
     if (!tops.length) return null;
     const currentY = window.scrollY;
     return tops.reduce((nearest, top) =>
-      Math.abs(top - currentY) < Math.abs(nearest - currentY) ? top : nearest
+      Math.abs(top - currentY) < Math.abs(nearest - currentY) ? top : nearest,
     );
   };
 
@@ -102,8 +116,8 @@ export default function About() {
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);
     };
-  // snapToNearestImmediate is stable (no deps) — safe to omit
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // snapToNearestImmediate is stable (no deps) — safe to omit
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
@@ -130,7 +144,9 @@ export default function About() {
           smoothScrollTo(next);
         }
       } else if (e.deltaY < 0) {
-        const prev = [...tops].reverse().find((top) => top < currentY - threshold);
+        const prev = [...tops]
+          .reverse()
+          .find((top) => top < currentY - threshold);
         if (prev !== undefined) {
           e.preventDefault();
           smoothScrollTo(prev);
@@ -140,71 +156,14 @@ export default function About() {
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
-  // getSectionTops / smoothScrollTo use only refs — safe to register once
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // getSectionTops / smoothScrollTo use only refs — safe to register once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Touch-based snapping (mobile)
-  useEffect(() => {
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let didSnap = false;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (!isMobileRef.current) return;
-      touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
-      didSnap = false;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!isMobileRef.current) return;
-      if (didSnap) return;
-
-      const targetNode = e.target as HTMLElement | null;
-      if (targetNode?.closest("#certifications")) return;
-
-      const deltaY = touchStartY - e.changedTouches[0].clientY;
-      const deltaX = touchStartX - e.changedTouches[0].clientX;
-
-      // Only snap on predominantly vertical swipes with enough distance
-      if (Math.abs(deltaX) > Math.abs(deltaY)) return;
-      if (Math.abs(deltaY) < 30) return;
-
-      if (isSnappingRef.current) return;
-
-      const tops = getSectionTops();
-      if (!tops.length) return;
-
-      const currentY = window.scrollY;
-      const threshold = 40;
-
-      if (deltaY > 0) {
-        // Swiped up → go to next section
-        const next = tops.find((top) => top > currentY + threshold);
-        if (next !== undefined) {
-          didSnap = true;
-          smoothScrollTo(next);
-        }
-      } else {
-        // Swiped down → go to previous section
-        const prev = [...tops].reverse().find((top) => top < currentY - threshold);
-        if (prev !== undefined) {
-          didSnap = true;
-          smoothScrollTo(prev);
-        }
-      }
-    };
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  // getSectionTops / smoothScrollTo use only refs — safe to register once
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Mobile touch snapping intentionally omitted.
+  // touchend fires after the browser has already started native momentum
+  // scroll, so any JS-driven snap competes with it and produces jank.
+  // Mobile users get smooth native scroll; desktop keeps wheel snapping.
 
   return (
     <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
@@ -268,6 +227,8 @@ export default function About() {
                     src="/Picture.jpg"
                     alt="Avatar"
                     fill
+                    sizes="(max-width: 640px) 160px, (max-width: 1024px) 224px, 288px"
+                    quality={85}
                     className="object-cover select-none"
                     priority
                   />

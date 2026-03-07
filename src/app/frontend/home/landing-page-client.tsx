@@ -106,6 +106,8 @@ export default function LandingPageClient({
                   src="/Picture.jpg"
                   alt="Avatar"
                   fill
+                  sizes="(max-width: 640px) 160px, (max-width: 1024px) 224px, 288px"
+                  quality={85}
                   className="object-cover select-none"
                   priority
                 />
