@@ -60,26 +60,75 @@ Personal developer portfolio showcasing projects, work experience, certification
 ```
 portfolio-craven/
 ├── src/
+│   ├── global.d.ts                     # Global TypeScript declarations
+│   ├── __tests__/                      # Jest test suites
+│   │   ├── about-page.test.tsx
+│   │   ├── featured-projects.test.tsx
+│   │   ├── landing-page-client.test.tsx
+│   │   └── mobile-performance.test.tsx
 │   └── app/
-│       ├── about/              # About page sections (experience, tech, certs, education)
+│       ├── favicon.ico
+│       ├── globals.css
+│       ├── layout.tsx                  # Root layout (fonts, providers, navbar, footer)
+│       ├── Logo.svg
+│       ├── page.tsx                    # Home page (landing + featured projects)
+│       ├── about/                      # About page sections
+│       │   ├── page.tsx
+│       │   ├── about-page.tsx          # Main about layout with scroll logic
+│       │   ├── about-data.ts
+│       │   ├── certification-data.tsx
+│       │   ├── certification-page.tsx
+│       │   ├── education-data.ts
+│       │   ├── education-page.tsx
+│       │   ├── experience-page.tsx
+│       │   ├── experiences-data.tsx
+│       │   ├── technologies-data.tsx
+│       │   └── techonologies-page.tsx
 │       ├── api/
-│       │   └── contact/        # POST route for contact form emails (Resend)
-│       ├── backend/            # Contentful client and data-fetching helpers
-│       ├── frontend/           # Shared UI components (navbar, footer, modals, transitions)
+│       │   └── contact/
+│       │       └── route.ts            # POST handler — email delivery via Resend
+│       ├── backend/                    # Server-side data fetching
+│       │   ├── contentful_init.tsx     # Contentful client + query helpers
+│       │   ├── featured_projectsClient.tsx
+│       │   └── types.ts
+│       ├── frontend/                   # Shared UI components
+│       │   ├── banner-background.tsx   # Animated gradient background (mouse-tracked)
+│       │   ├── featured[slug]_Design.tsx
 │       │   ├── contact-modal/
+│       │   │   ├── contact-modal-context.tsx
+│       │   │   └── contact-modal.tsx
 │       │   ├── footer/
-│       │   ├── home/           # Landing page + featured projects
+│       │   │   ├── footer-lazy.tsx     # Dynamic import wrapper
+│       │   │   └── footer.tsx
+│       │   ├── home/                   # Landing page + featured projects
+│       │   │   ├── featured-projects.tsx
+│       │   │   ├── landing-page-client.tsx
+│       │   │   ├── landing-page.tsx
+│       │   │   └── socials-link.tsx
 │       │   ├── navigation-bar/
+│       │   │   └── navbar.tsx
 │       │   └── page-transition/
-│       ├── projects/
-│       │   └── [slug]/         # Dynamic project pages + case study subpages
-│       ├── resume/             # Resume page
-│       ├── layout.tsx
-│       ├── page.tsx
-│       └── globals.css
-├── public/                     # Static assets
+│       │       └── page-transition.tsx
+│       └── projects/
+│           └── [slug]/                 # Dynamic project detail pages
+│               ├── loading.tsx
+│               ├── page.tsx
+│               ├── ProjectPageClient.tsx
+│               └── casestudy/          # Per-project deep-dive pages
+│                   ├── CaseStudyPageClient.tsx
+│                   ├── loading.tsx
+│                   └── page.tsx
+├── public/                             # Static assets
+│   ├── badge/                          # Badge images
+│   ├── Logo.svg
+│   ├── Logo-Avatar.svg
+│   ├── Picture.jpg                     # Profile photo
+│   └── Master-Resume.pdf
+├── eslint.config.mjs
+├── jest.config.ts
+├── jest.setup.ts
 ├── next.config.ts
-├── tailwind.config.ts
+├── postcss.config.mjs                  # Tailwind CSS v4 config (via PostCSS)
 └── tsconfig.json
 ```
 
