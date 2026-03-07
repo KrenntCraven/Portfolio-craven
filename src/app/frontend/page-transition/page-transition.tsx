@@ -40,8 +40,7 @@ export function PageTransitionProvider({
   const skipHeavyAnimation = useRef(
     typeof window !== "undefined" &&
       (window.matchMedia("(pointer: coarse)").matches ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        navigator.maxTouchPoints > 0),
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches),
   ).current;
 
   const startTransition = useCallback(
@@ -262,8 +261,7 @@ export function PageTransitionProvider({
                 stroke="url(#page-transition-gradient)"
                 strokeWidth={2}
                 vectorEffect="non-scaling-stroke"
-                d={PATHS.closed}
-                initial={false}
+                initial={{ d: PATHS.closed }}
                 animate={{
                   d:
                     phase === "cover"
@@ -272,8 +270,8 @@ export function PageTransitionProvider({
                 }}
                 transition={
                   phase === "cover"
-                    ? { duration: 0.55, times: [0, 0.5, 1], ease: "easeInOut" }
-                    : { duration: 0 }
+                    ? { duration: 0.55, times: [0, 0.5, 1], ease: "easeInOut", type: "tween" }
+                    : { duration: 0, type: "tween" }
                 }
                 onAnimationComplete={
                   phase === "cover" ? handleAnimationComplete : undefined
