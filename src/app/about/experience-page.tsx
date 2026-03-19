@@ -134,7 +134,7 @@ export default function ExperiencePage() {
                           }}
                           className="group/item flex items-start gap-3 leading-[2.2] sm:leading-loose lg:leading-loose"
                         >
-                          <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500 transition-transform duration-200 group-hover/item:scale-125" />
+                          <span className="mt-[0.75em] h-2 w-2 flex-shrink-0 rounded-full bg-neutral-500 transition-transform duration-200 group-hover/item:scale-125" />
                           <span className="text-left sm:text-justify hyphens-auto sm:hyphens-auto md:hyphens-auto lg:hyphens-none group-hover/item:text-neutral-900 transition-colors duration-200">
                             {item}
                           </span>
