@@ -136,7 +136,7 @@ export default function FeaturedProjectsClient({
                       <span className="h-1.5 w-1.5 rounded-full bg-[#6c5ce7]" />
                       <span>UI/UX</span>
                     </div>
-                    <h3 className="mb-2 line-clamp-2 text-xl font-semibold text-neutral-900 sm:text-2xl">
+                    <h3 className="mb-2 line-clamp-2 text-xl font-semibold text-neutral-800 sm:text-2xl">
                       {firstTextCapitalize(project.title)}
                     </h3>
                     <p className="text-sm text-neutral-600 sm:text-base">

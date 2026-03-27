@@ -103,7 +103,7 @@ export const Technologies = (): JSX.Element => {
       <section className="relative mx-auto max-w-7xl px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-16 lg:px-8 lg:pt-24">
         <h1
           ref={titleRef}
-          className="mb-12 text-center text-4xl font-semibold text-neutral-900 sm:text-5xl lg:mb-16"
+          className="mb-12 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-16"
         >
           Technologies & Tools
         </h1>
@@ -147,7 +147,7 @@ export const Technologies = (): JSX.Element => {
                     (() => renderIcon(CubeIcon))
                   )()}
                 </motion.div>
-                <h2 className="text-2xl font-bold text-neutral-900">
+                <h2 className="text-2xl font-semibold text-neutral-800">
                   {category.title}
                 </h2>
               </div>

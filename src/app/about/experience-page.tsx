@@ -108,7 +108,7 @@ export default function ExperiencePage() {
                   <div className="relative">
                     {/* Company and Period */}
                     <div className="mb-4 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-                      <h2 className="text-2xl font-bold text-neutral-900 sm:text-3xl">
+                      <h2 className="text-2xl font-semibold text-neutral-800 sm:text-3xl">
                         {data[currentIndex].company}
                       </h2>
                       <span className="whitespace-nowrap text-base font-medium text-neutral-700 sm:text-base md:text-lg lg:text-xl">
