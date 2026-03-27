@@ -1,10 +1,15 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import { animate, motion } from "framer-motion";
+import {
+  animate,
+  motion,
+  useTransform,
+} from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { BannerBackground } from "../banner-background";
+import { FloatingShapes, useMouseParallax } from "../use-mouse-parallax";
 import { getSocials } from "./socials-link";
 
 const fadeUp = {
@@ -81,9 +86,24 @@ export default function LandingPageClient({
 
   const socials = getSocials(resumeUrl);
 
+  // Mouse parallax – avatar 3D tilt + floating shapes (desktop only)
+  const { x: mx, y: my, skip: skipParallax } = useMouseParallax();
+  const tiltX = useTransform(my, [0, 1], [6, -6]);   // rotate around X-axis
+  const tiltY = useTransform(mx, [0, 1], [-6, 6]);    // rotate around Y-axis
+  const avatarTx = useTransform(mx, [0, 1], [-8, 8]); // subtle horizontal drift
+  const avatarTy = useTransform(my, [0, 1], [-6, 6]); // subtle vertical drift
+
   return (
     <main className="relative isolate overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[820px] dark:bg-background dark:text-foreground">
       <BannerBackground />
+
+      {/* Floating geometric shapes – desktop only */}
+      {!skipParallax && (
+        <div className="absolute inset-0 z-1 overflow-hidden" aria-hidden>
+          <FloatingShapes x={mx} y={my} />
+        </div>
+      )}
+
       <section className="relative z-10 mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 pb-16 pt-12 sm:gap-10 sm:px-6 sm:pb-20 sm:pt-16 lg:flex-row lg:items-center lg:gap-16 lg:px-8 lg:pt-24">
         {/* Avatar - Mobile First (appears first on mobile) */}
         <motion.div
@@ -92,8 +112,28 @@ export default function LandingPageClient({
           animate="animate"
           transition={{ delay: 0.1, duration: 0.7 }}
           className="w-full max-w-sm lg:order-2 lg:flex-1"
+          style={
+            skipParallax
+              ? undefined
+              : {
+                  perspective: 600,
+                }
+          }
         >
-          <div className="relative flex flex-col items-center gap-4 sm:gap-5">
+          <motion.div
+            className="relative flex flex-col items-center gap-4 sm:gap-5"
+            style={
+              skipParallax
+                ? undefined
+                : {
+                    rotateX: tiltX,
+                    rotateY: tiltY,
+                    x: avatarTx,
+                    y: avatarTy,
+                    willChange: "transform",
+                  }
+            }
+          >
             {/* Avatar Image */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -113,7 +153,7 @@ export default function LandingPageClient({
                 />
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Text Content - Second on mobile */}

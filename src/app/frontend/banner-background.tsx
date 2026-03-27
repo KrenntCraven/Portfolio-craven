@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 function useIsTouch() {
   const [isTouch, setIsTouch] = useState(false);
@@ -27,7 +27,7 @@ function useReducedMotion() {
  * On touch/mobile devices or when reduced-motion is preferred,
  * renders static orbs with no mouse tracking or animation cost.
  */
-export function BannerBackground() {
+export const BannerBackground = memo(function BannerBackground() {
   const isTouch = useIsTouch();
   const reducedMotion = useReducedMotion();
   const skip = isTouch || reducedMotion;
@@ -117,4 +117,4 @@ export function BannerBackground() {
       <div className="absolute inset-x-12 sm:inset-x-24 -bottom-48 h-72 rounded-[36px] bg-black/5 blur-3xl dark:bg-white/5" />
     </div>
   );
-}
+});

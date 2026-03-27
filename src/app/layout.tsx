@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { ContactModalProvider } from "./frontend/contact-modal/contact-modal-context";
 import FooterLazy from "./frontend/footer/footer-lazy";
@@ -13,8 +13,17 @@ const poppins = Poppins({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
+};
+
 export const metadata: Metadata = {
-  title: "Krennt Craven",
+  title: {
+    default: "Krennt Craven",
+    template: "%s | Krennt Craven",
+  },
   description: "Krennt Craven's Personal Portfolio Website",
   icons: {
     icon: "/Logo.svg",

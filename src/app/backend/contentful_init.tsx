@@ -1,9 +1,9 @@
-import "server-only";
 import type { Asset, EntryFieldTypes } from "contentful";
 import { createClient } from "contentful";
 import { unstable_cache } from "next/cache";
+import "server-only";
+import type { ImpactStat, Project } from "./types";
 export type { Project } from "./types";
-import type { Project } from "./types";
 
 const client = createClient({
   space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID!,
@@ -31,6 +31,7 @@ interface ProjectEntryFields {
   technicalCaseStudy?: EntryFieldTypes.RichText;
   impactOutcomeCaseStudy?: EntryFieldTypes.RichText;
   challengesLearningsCaseStudy?: EntryFieldTypes.RichText;
+  impactStats?: EntryFieldTypes.Object;
   order?: EntryFieldTypes.Integer;
 }
 
@@ -76,6 +77,7 @@ async function _getFeaturedProjects(): Promise<Project[]> {
       technicalCaseStudy: item.fields.technicalCaseStudy,
       impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
       challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
+      impactStats: item.fields.impactStats as ImpactStat[] | undefined,
       githubLink: item.fields.githubLink,
       siteLink: item.fields.siteLink,
       order: item.fields.order,
@@ -125,6 +127,7 @@ async function _getProjectBySlug(slug: string): Promise<Project | null> {
     technicalCaseStudy: item.fields.technicalCaseStudy,
     impactOutcomeCaseStudy: item.fields.impactOutcomeCaseStudy,
     challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
+    impactStats: item.fields.impactStats as ImpactStat[] | undefined,
     siteLink: item.fields.siteLink,
     technologies: item.fields.technologies,
     githubLink: item.fields.githubLink,
@@ -133,11 +136,10 @@ async function _getProjectBySlug(slug: string): Promise<Project | null> {
 }
 
 export function getProjectBySlug(slug: string): Promise<Project | null> {
-  return unstable_cache(
-    () => _getProjectBySlug(slug),
-    [`project-${slug}`],
-    { revalidate: 3600, tags: [`project-${slug}`, "projects"] },
-  )();
+  return unstable_cache(() => _getProjectBySlug(slug), [`project-${slug}`], {
+    revalidate: 3600,
+    tags: [`project-${slug}`, "projects"],
+  })();
 }
 
 interface ResumeEntryFields {
@@ -164,10 +166,9 @@ async function _getResumeUrl(): Promise<string | null> {
   return `https:${file.fields.file.url}`;
 }
 
-export const getResumeUrl = unstable_cache(
-  _getResumeUrl,
-  ["resume-url"],
-  { revalidate: 3600, tags: ["resume"] },
-);
+export const getResumeUrl = unstable_cache(_getResumeUrl, ["resume-url"], {
+  revalidate: 3600,
+  tags: ["resume"],
+});
 
 export default client;

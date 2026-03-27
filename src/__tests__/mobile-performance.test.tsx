@@ -6,7 +6,7 @@
  *  1. BannerBackground – touch / reduced-motion detection skips mouse tracking
  *  2. PageTransitionProvider – deadline safety-net prevents stuck overlay
  *  3. About page – mobile paragraph variant on narrow viewport
- *  4. About page – touch-swipe section snapping (vertical threshold, horizontal ignore)
+ *  4. About page – mobile uses native scrolling (no touch snapping)
  *  5. About page – resize debounce adds / removes listener
  *  6. LandingPageClient – wheel listener registered with { passive: false }
  *  7. LandingPageClient – wheel listener cleaned up on unmount
@@ -293,7 +293,7 @@ describe("About page – mobile paragraph variant", () => {
   });
 });
 
-describe("About page – touch swipe section snapping", () => {
+describe("About page – mobile uses native scrolling (no touch snapping)", () => {
   beforeEach(() => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 375 });
     Object.defineProperty(navigator, "maxTouchPoints", { configurable: true, value: 5 });
@@ -304,55 +304,13 @@ describe("About page – touch swipe section snapping", () => {
     Object.defineProperty(navigator, "maxTouchPoints", { configurable: true, value: 0 });
   });
 
-  it("registers touchstart and touchend listeners on mobile", async () => {
+  it("does NOT register touchstart/touchend listeners (native scroll only)", async () => {
     const addSpy = jest.spyOn(window, "addEventListener");
     await act(async () => { render(<About />); });
     const events = addSpy.mock.calls.map(([e]) => e);
-    expect(events).toContain("touchstart");
-    expect(events).toContain("touchend");
+    expect(events).not.toContain("touchstart");
+    expect(events).not.toContain("touchend");
     addSpy.mockRestore();
-  });
-
-  it("removes touchstart and touchend listeners on unmount", async () => {
-    const removeSpy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = render(<About />);
-    await act(async () => { unmount(); });
-    const events = removeSpy.mock.calls.map(([e]) => e);
-    expect(events).toContain("touchstart");
-    expect(events).toContain("touchend");
-    removeSpy.mockRestore();
-  });
-
-  it("ignores touch events that are predominantly horizontal", async () => {
-    const scrollSpy = jest.spyOn(window, "scrollTo").mockImplementation(() => {});
-    await act(async () => { render(<About />); });
-    // Dispatch on document.body so it bubbles to window and e.target has .closest()
-    fireEvent(document.body, new TouchEvent("touchstart", {
-      touches: [{ clientX: 100, clientY: 200, identifier: 0, target: document.body } as Touch],
-      bubbles: true,
-    }));
-    fireEvent(document.body, new TouchEvent("touchend", {
-      changedTouches: [{ clientX: 40, clientY: 205, identifier: 0, target: document.body } as Touch],
-      bubbles: true,
-    }));
-    expect(scrollSpy).not.toHaveBeenCalled();
-    scrollSpy.mockRestore();
-  });
-
-  it("ignores touch events with < 30 px vertical distance (accidental tap)", async () => {
-    const scrollSpy = jest.spyOn(window, "scrollTo").mockImplementation(() => {});
-    await act(async () => { render(<About />); });
-    // Dispatch on document.body so it bubbles to window and e.target has .closest()
-    fireEvent(document.body, new TouchEvent("touchstart", {
-      touches: [{ clientX: 100, clientY: 200, identifier: 0, target: document.body } as Touch],
-      bubbles: true,
-    }));
-    fireEvent(document.body, new TouchEvent("touchend", {
-      changedTouches: [{ clientX: 100, clientY: 215, identifier: 0, target: document.body } as Touch],
-      bubbles: true,
-    }));
-    expect(scrollSpy).not.toHaveBeenCalled();
-    scrollSpy.mockRestore();
   });
 
   it("registers resize listener", async () => {

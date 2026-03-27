@@ -240,8 +240,8 @@ export default function Footer() {
           <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
             {/* Logo */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={skipAnimations ? false : { opacity: 0, y: 20 }}
+              whileInView={skipAnimations ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="flex flex-col gap-4"
             >
@@ -280,10 +280,10 @@ export default function Footer() {
 
             {/* Quick Links */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={skipAnimations ? false : { opacity: 0, y: 20 }}
+              whileInView={skipAnimations ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+              transition={skipAnimations ? {} : { delay: 0.1 }}
             >
               <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
               <nav className="flex flex-col gap-3">
@@ -329,10 +329,10 @@ export default function Footer() {
 
             {/* Contact */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={skipAnimations ? false : { opacity: 0, y: 20 }}
+              whileInView={skipAnimations ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
+              transition={skipAnimations ? {} : { delay: 0.2 }}
             >
               <h3 className="text-lg font-semibold mb-6">Get In Touch</h3>
               <div className="flex flex-col gap-4 text-white/70 text-sm">
@@ -407,10 +407,10 @@ export default function Footer() {
           <div className="h-px my-10 bg-linear-to-r from-transparent via-white/20 to-transparent" />
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={skipAnimations ? false : { opacity: 0, y: 20 }}
+            whileInView={skipAnimations ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
+            transition={skipAnimations ? {} : { delay: 0.3 }}
             className="flex flex-col md:flex-row items-center justify-between gap-6"
           >
             <p className="text-white/60 text-sm">

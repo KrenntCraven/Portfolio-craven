@@ -1,5 +1,11 @@
 import type { Document } from "@contentful/rich-text-types";
 
+export type ImpactStat = {
+  value: string;
+  label: string;
+  description?: string;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -20,4 +26,5 @@ export type Project = {
   technicalCaseStudy?: Document;
   impactOutcomeCaseStudy?: Document;
   challengesLearningsCaseStudy?: Document;
+  impactStats?: ImpactStat[];
 };

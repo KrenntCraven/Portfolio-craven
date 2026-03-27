@@ -1,18 +1,61 @@
 "use client";
-import { animate, motion } from "framer-motion";
+import {
+  animate,
+  motion,
+  useTransform,
+} from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 import { BannerBackground } from "../frontend/banner-background";
+import {
+  FloatingShapes,
+  useMouseParallax,
+} from "../frontend/use-mouse-parallax";
 import { aboutMobileParagraphs, aboutParagraphs } from "./about-data";
 
 const ExperiencePage = dynamic(() => import("./experience-page"), {
-  loading: () => <div className="min-h-screen" />,
+  loading: () => (
+    <section className="min-h-screen mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl space-y-4">
+        <div className="h-10 w-56 animate-pulse rounded-xl bg-neutral-100" />
+        {[1, 2, 3].map((n) => (
+          <div
+            key={n}
+            className="rounded-2xl border border-neutral-100 p-6 space-y-3"
+          >
+            <div className="h-5 w-40 animate-pulse rounded bg-neutral-100" />
+            <div className="h-4 w-28 animate-pulse rounded bg-neutral-50" />
+            <div className="h-4 w-full animate-pulse rounded bg-neutral-50" />
+            <div className="h-4 w-5/6 animate-pulse rounded bg-neutral-50" />
+          </div>
+        ))}
+      </div>
+    </section>
+  ),
 });
 
 const Certification = dynamic(() => import("./certification-page"), {
-  loading: () => <div className="min-h-screen" />,
+  loading: () => (
+    <section className="min-h-screen mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl space-y-4">
+        <div className="h-10 w-48 animate-pulse rounded-xl bg-neutral-100" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((n) => (
+            <div
+              key={n}
+              className="rounded-xl border border-neutral-100 p-5 space-y-2"
+            >
+              <div className="h-10 w-10 animate-pulse rounded-lg bg-neutral-100" />
+              <div className="h-5 w-3/4 animate-pulse rounded bg-neutral-100" />
+              <div className="h-3 w-1/2 animate-pulse rounded bg-neutral-50" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ),
 });
 
 const Technologies = dynamic(
@@ -20,7 +63,23 @@ const Technologies = dynamic(
     import("./techonologies-page").then((mod) => ({
       default: mod.Technologies,
     })),
-  { loading: () => <div className="min-h-100" /> },
+  {
+    loading: () => (
+      <section className="min-h-100 mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl space-y-4">
+          <div className="h-10 w-52 animate-pulse rounded-xl bg-neutral-100" />
+          <div className="flex flex-wrap gap-3">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-9 animate-pulse rounded-full bg-neutral-100"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+  },
 );
 
 const fadeUp = {
@@ -158,12 +217,26 @@ export default function About() {
     window.addEventListener("wheel", handleWheel, { passive: false });
     return () => window.removeEventListener("wheel", handleWheel);
   }, []);
-  // scroll, so any JS-driven snap competes with it and produces jank.
-  // Mobile users get smooth native scroll; desktop keeps wheel snapping.
+
+  // Mobile: let the browser handle native momentum scrolling — no touch snapping
+
+  // Mouse parallax – avatar tilt + floating shapes (desktop only)
+  const { x: mx, y: my, skip: skipParallax } = useMouseParallax();
+  const tiltX = useTransform(my, [0, 1], [6, -6]);
+  const tiltY = useTransform(mx, [0, 1], [-6, 6]);
+  const avatarTx = useTransform(mx, [0, 1], [-8, 8]);
+  const avatarTy = useTransform(my, [0, 1], [-6, 6]);
 
   return (
     <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
       <BannerBackground />
+
+      {/* Floating geometric shapes scoped to hero – desktop only */}
+      {!skipParallax && (
+        <div className="absolute inset-x-0 top-0 h-screen z-1 overflow-hidden pointer-events-none" aria-hidden>
+          <FloatingShapes x={mx} y={my} />
+        </div>
+      )}
 
       <section
         id="about"
@@ -209,8 +282,22 @@ export default function About() {
             animate="animate"
             transition={{ delay: 0.2, duration: 0.7 }}
             className="w-full lg:flex-[0.65]"
+            style={skipParallax ? undefined : { perspective: 600 }}
           >
-            <div className="relative flex flex-col items-center gap-4 sm:gap-5">
+            <motion.div
+              className="relative flex flex-col items-center gap-4 sm:gap-5"
+              style={
+                skipParallax
+                  ? undefined
+                  : {
+                      rotateX: tiltX,
+                      rotateY: tiltY,
+                      x: avatarTx,
+                      y: avatarTy,
+                      willChange: "transform",
+                    }
+              }
+            >
               {/* Avatar Image */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -246,7 +333,7 @@ export default function About() {
                   />
                 </motion.div>
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
