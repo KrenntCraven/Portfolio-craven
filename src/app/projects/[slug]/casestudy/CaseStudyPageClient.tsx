@@ -85,7 +85,7 @@ function CollapsibleContent({ children }: { children: React.ReactNode }) {
         ].join(" ")}
         {...(needsCollapse && !expanded
           ? { style: { maxHeight: COLLAPSE_HEIGHT } }
-          : {})}  
+          : {})}
       >
         {children}
       </div>
@@ -104,15 +104,35 @@ function CollapsibleContent({ children }: { children: React.ReactNode }) {
             {expanded ? (
               <>
                 Show less
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 15l7-7 7 7"
+                  />
                 </svg>
               </>
             ) : (
               <>
                 Read more
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </>
             )}
@@ -200,7 +220,7 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
   const labeledSections = sectionsToRender.filter((s) => s.label);
 
   return (
-    <main className="relative min-h-screen overflow-x-clip bg-white text-neutral-800">
+    <div className="relative min-h-screen overflow-x-clip bg-white text-neutral-800">
       <BannerBackground />
 
       {/* Back button */}
@@ -305,7 +325,9 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
           id={id}
           label={label}
           index={index}
-          stats={id === "impact-outcome-case-study" ? project.impactStats : undefined}
+          stats={
+            id === "impact-outcome-case-study" ? project.impactStats : undefined
+          }
         >
           {documentToReactComponents(project[field] as Document)}
         </CaseStudySection>
@@ -380,12 +402,22 @@ export default function CaseStudyPageClient({ project }: { project: Project }) {
             className="fixed bottom-6 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-neutral-200 bg-white/90 shadow-lg backdrop-blur-sm transition-colors hover:bg-[#6c5ce7]/10 hover:border-[#6c5ce7]/40 sm:hidden"
             aria-label="Scroll to top"
           >
-            <svg className="h-5 w-5 text-[#6c5ce7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            <svg
+              className="h-5 w-5 text-[#6c5ce7]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 15l7-7 7 7"
+              />
             </svg>
           </motion.button>
         )}
       </AnimatePresence>
-    </main>
+    </div>
   );
 }

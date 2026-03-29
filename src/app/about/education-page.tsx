@@ -18,7 +18,7 @@ const fadeUp = {
 
 export const Education = (): JSX.Element => {
   return (
-    <main className="relative min-h-0 overflow-hidden bg-white text-neutral-900 pt-10 sm:pt-20 md:pt-10 lg:pt-2">
+    <div className="relative min-h-0 overflow-hidden bg-white text-neutral-900 pt-10 sm:pt-20 md:pt-10 lg:pt-2">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(0,0,0,0.03),transparent_28%)]" />
@@ -115,6 +115,6 @@ export const Education = (): JSX.Element => {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 };

@@ -52,7 +52,7 @@ export default function ExperiencePage() {
   };
 
   return (
-    <main
+    <div
       id="experience"
       className="relative min-h-[100dvh] overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
     >
@@ -169,12 +169,14 @@ export default function ExperiencePage() {
               transition={{ delay: 0.3 }}
               className="text-center text-sm font-medium text-neutral-600"
             >
-              <span className="font-semibold text-neutral-800">{currentIndex + 1}</span>
+              <span className="font-semibold text-neutral-800">
+                {currentIndex + 1}
+              </span>
               <span className="text-neutral-500"> / {data.length}</span>
             </motion.div>
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

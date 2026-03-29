@@ -1,11 +1,7 @@
 "use client";
 
 import { Button } from "@heroui/button";
-import {
-  animate,
-  motion,
-  useTransform,
-} from "framer-motion";
+import { animate, motion, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { BannerBackground } from "../banner-background";
@@ -88,13 +84,13 @@ export default function LandingPageClient({
 
   // Mouse parallax – avatar 3D tilt + floating shapes (desktop only)
   const { x: mx, y: my, skip: skipParallax } = useMouseParallax();
-  const tiltX = useTransform(my, [0, 1], [6, -6]);   // rotate around X-axis
-  const tiltY = useTransform(mx, [0, 1], [-6, 6]);    // rotate around Y-axis
+  const tiltX = useTransform(my, [0, 1], [6, -6]); // rotate around X-axis
+  const tiltY = useTransform(mx, [0, 1], [-6, 6]); // rotate around Y-axis
   const avatarTx = useTransform(mx, [0, 1], [-8, 8]); // subtle horizontal drift
   const avatarTy = useTransform(my, [0, 1], [-6, 6]); // subtle vertical drift
 
   return (
-    <main className="relative isolate overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[820px] dark:bg-background dark:text-foreground">
+    <div className="relative isolate overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28 min-h-[820px] dark:bg-background dark:text-foreground">
       <BannerBackground />
 
       {/* Floating geometric shapes – desktop only */}
@@ -231,6 +227,6 @@ export default function LandingPageClient({
           </div>
         </motion.div>
       </section>
-    </main>
+    </div>
   );
 }

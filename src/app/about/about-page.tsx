@@ -1,9 +1,5 @@
 "use client";
-import {
-  animate,
-  motion,
-  useTransform,
-} from "framer-motion";
+import { animate, motion, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
@@ -180,6 +176,20 @@ export default function About() {
     };
   }, []);
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isMobileRef.current) {
+        setShowScrollTop(window.scrollY > 300);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const aboutData = isMobile ? aboutMobileParagraphs : aboutParagraphs;
 
   // Wheel-based snapping (desktop)
@@ -228,12 +238,15 @@ export default function About() {
   const avatarTy = useTransform(my, [0, 1], [-6, 6]);
 
   return (
-    <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
+    <div className="relative min-h-screen overflow-visible bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
       <BannerBackground />
 
       {/* Floating geometric shapes scoped to hero – desktop only */}
       {!skipParallax && (
-        <div className="absolute inset-x-0 top-0 h-screen z-1 overflow-hidden pointer-events-none" aria-hidden>
+        <div
+          className="absolute inset-x-0 top-0 h-screen z-1 overflow-hidden pointer-events-none"
+          aria-hidden
+        >
           <FloatingShapes x={mx} y={my} />
         </div>
       )}
@@ -340,6 +353,34 @@ export default function About() {
       <ExperiencePage />
       <Certification />
       <Technologies />
-    </main>
+
+      {/* Scroll-to-top button – mobile only */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={
+          showScrollTop ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }
+        }
+        transition={{ duration: 0.25 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Scroll to top"
+        className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-neutral-800 text-white shadow-lg active:scale-95 md:hidden"
+        style={{ pointerEvents: showScrollTop ? "auto" : "none" }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+          stroke="currentColor"
+          className="h-5 w-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4.5 15.75l7.5-7.5 7.5 7.5"
+          />
+        </svg>
+      </motion.button>
+    </div>
   );
 }

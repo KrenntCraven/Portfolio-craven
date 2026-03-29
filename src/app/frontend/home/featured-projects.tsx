@@ -43,7 +43,7 @@ export default function FeaturedProjectsClient({
   };
 
   return (
-    <main className="relative min-h-screen overflow-visible bg-white text-neutral-900 pb-24">
+    <div className="relative min-h-screen overflow-visible bg-white text-neutral-900 pb-24">
       <BannerBackground />
 
       <section
@@ -149,6 +149,6 @@ export default function FeaturedProjectsClient({
           </motion.div>
         </motion.div>
       </section>
-    </main>
+    </div>
   );
 }
