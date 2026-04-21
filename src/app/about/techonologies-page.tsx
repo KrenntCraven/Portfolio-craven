@@ -87,7 +87,7 @@ export const Technologies = (): JSX.Element => {
   }, [isInView]);
 
   return (
-    <div
+    <section
       id="technologies"
       className="relative min-h-screen overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
     >
@@ -176,6 +176,6 @@ export const Technologies = (): JSX.Element => {
           ))}
         </div>
       </section>
-    </div>
+    </section>
   );
 };

@@ -52,7 +52,7 @@ export default function ExperiencePage() {
   };
 
   return (
-    <div
+    <section
       id="experience"
       className="relative min-h-[100dvh] overflow-hidden bg-white text-neutral-900 pt-16 sm:pt-20 md:pt-24 lg:pt-28"
     >
@@ -177,6 +177,6 @@ export default function ExperiencePage() {
           </div>
         </div>
       </section>
-    </div>
+    </section>
   );
 }
