@@ -26,6 +26,9 @@ export const metadata: Metadata = {
     template: "%s | Krennt Craven",
   },
   description: "Krennt Craven's Personal Portfolio Website",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/Logo.svg",
   },
