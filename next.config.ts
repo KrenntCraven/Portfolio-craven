@@ -17,6 +17,21 @@ const nextConfig: NextConfig = {
   // Compress responses at the framework level
   compress: true,
 
+  // Redirect the default Vercel deployment URL to the canonical custom domain
+  redirects: async () => [
+    {
+      source: "/:path*",
+      has: [
+        {
+          type: "host",
+          value: "krennt-craven.vercel.app",
+        },
+      ],
+      destination: "https://krenntcraven.com/:path*",
+      permanent: true,
+    },
+  ],
+
   // HTTP caching headers for static assets, fonts, and images
   headers: async () => [
     {
