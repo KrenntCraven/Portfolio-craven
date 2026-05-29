@@ -20,6 +20,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://krenntcraven.com"),
   title: {
     default: "Krennt Craven",
     template: "%s | Krennt Craven",
@@ -27,6 +28,18 @@ export const metadata: Metadata = {
   description: "Krennt Craven's Personal Portfolio Website",
   icons: {
     icon: "/Logo.svg",
+  },
+  openGraph: {
+    title: "Krennt Craven",
+    description: "Krennt Craven's Personal Portfolio Website",
+    url: "https://krenntcraven.com",
+    siteName: "Krennt Craven",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Krennt Craven",
+    description: "Krennt Craven's Personal Portfolio Website",
   },
 };
 

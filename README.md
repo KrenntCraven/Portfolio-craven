@@ -1,6 +1,6 @@
 # Portfolio — Craven
 
-**Live Demo:** [https://portfolio-craven.vercel.app/](https://portfolio-craven.vercel.app/)
+**Live Demo:** [https://krenntcraven.com](https://krenntcraven.com)
 
 Personal developer portfolio showcasing projects, work experience, certifications, and a built-in contact form — built with Next.js 16 and powered by Contentful as a headless CMS.
 
