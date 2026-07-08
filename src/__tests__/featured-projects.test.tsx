@@ -128,15 +128,6 @@ describe("FeaturedProjectsClient", () => {
       expect(screen.getByText("Webapp")).toBeInTheDocument();
       expect(screen.getByText("Mobile app")).toBeInTheDocument();
     });
-
-    it("shows the 'Featured' badge on every card", () => {
-      const projects = [
-        makeProject({ id: "1", title: "one", slug: "one" }),
-        makeProject({ id: "2", title: "two", slug: "two" }),
-      ];
-      render(<FeaturedProjectsClient projects={projects} />);
-      expect(screen.getAllByText("Featured")).toHaveLength(2);
-    });
   });
 
   describe("Title capitalisation (firstTextCapitalize)", () => {

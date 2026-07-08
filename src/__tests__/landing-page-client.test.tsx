@@ -6,6 +6,7 @@
 
 import { render, screen } from "@testing-library/react";
 import LandingPageClient from "@/app/frontend/home/landing-page-client";
+import { ContactModalProvider } from "@/app/frontend/contact-modal/contact-modal-context";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -83,7 +84,12 @@ jest.mock("@/app/frontend/banner-background", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 
-const renderWithUrl = () => render(<LandingPageClient />);
+const renderHero = () =>
+  render(
+    <ContactModalProvider>
+      <LandingPageClient />
+    </ContactModalProvider>,
+  );
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -91,67 +97,71 @@ const renderWithUrl = () => render(<LandingPageClient />);
 
 describe("LandingPageClient", () => {
   describe("Hero heading & intro text", () => {
-    it("renders the name introduction text", () => {
-      renderWithUrl();
+    it("renders the availability eyebrow", () => {
+      renderHero();
       expect(
-        screen.getByText(/Hello, I'm Krennt Craven/i)
+        screen.getByText(/Full-Stack & Cloud Engineer/i)
       ).toBeInTheDocument();
     });
 
     it("renders the main h1 heading", () => {
-      renderWithUrl();
+      renderHero();
       expect(
         screen.getByRole("heading", { level: 1 })
-      ).toHaveTextContent(/Software Engineer Focused on Reliable Web and Mobile Solutions/i);
+      ).toHaveTextContent(/Hi, I'm Krennt Craven/i);
     });
 
     it("renders the tagline paragraph", () => {
-      renderWithUrl();
+      renderHero();
       expect(
-        screen.getByText(/I turn ideas into scalable, real-world applications/i)
+        screen.getByText(/reliable from first commit to production/i)
       ).toBeInTheDocument();
     });
   });
 
   describe("Avatar image", () => {
     it("renders the profile picture with an accessible alt text", () => {
-      renderWithUrl();
-      expect(screen.getByAltText("Avatar")).toBeInTheDocument();
+      renderHero();
+      expect(screen.getByAltText("Krennt Craven")).toBeInTheDocument();
     });
   });
 
-  describe("Social / action buttons", () => {
-    it("renders the GitHub button", () => {
-      renderWithUrl();
-      expect(screen.getByText("GitHub")).toBeInTheDocument();
+  describe("Primary CTAs", () => {
+    it("renders the 'View Projects' button", () => {
+      renderHero();
+      expect(
+        screen.getByRole("button", { name: /View Projects/i })
+      ).toBeInTheDocument();
     });
 
-    it("renders the LinkedIn button", () => {
-      renderWithUrl();
-      expect(screen.getByText("LinkedIn")).toBeInTheDocument();
-    });
-
-    it("renders the Gmail button", () => {
-      renderWithUrl();
-      expect(screen.getByText("Gmail")).toBeInTheDocument();
-    });
-
-    it("renders the Resume button", () => {
-      renderWithUrl();
-      expect(screen.getByText("Resume")).toBeInTheDocument();
-    });
-
-    it("does NOT render the Facebook button (filtered out)", () => {
-      renderWithUrl();
-      expect(screen.queryByText("Facebook")).not.toBeInTheDocument();
+    it("renders the 'Get in touch' button", () => {
+      renderHero();
+      expect(
+        screen.getByRole("button", { name: /Get in touch/i })
+      ).toBeInTheDocument();
     });
   });
 
-  describe("Resume link", () => {
-    it("points the Resume button to the self-hosted /resume.pdf", () => {
-      renderWithUrl();
-      const resumeLink = screen.getByText("Resume").closest("a");
-      expect(resumeLink).toHaveAttribute("href", "/resume.pdf");
+  describe("Social icon links", () => {
+    it("renders the GitHub, LinkedIn, Gmail, and Resume links", () => {
+      renderHero();
+      expect(screen.getByLabelText("GitHub")).toBeInTheDocument();
+      expect(screen.getByLabelText("LinkedIn")).toBeInTheDocument();
+      expect(screen.getByLabelText("Gmail")).toBeInTheDocument();
+      expect(screen.getByLabelText("Resume")).toBeInTheDocument();
+    });
+
+    it("does NOT render the Facebook link (filtered out)", () => {
+      renderHero();
+      expect(screen.queryByLabelText("Facebook")).not.toBeInTheDocument();
+    });
+
+    it("points the Resume link to the self-hosted /resume.pdf", () => {
+      renderHero();
+      expect(screen.getByLabelText("Resume")).toHaveAttribute(
+        "href",
+        "/resume.pdf",
+      );
     });
   });
 });

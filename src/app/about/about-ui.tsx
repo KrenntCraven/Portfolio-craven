@@ -28,17 +28,6 @@ export function AboutGridOverlay() {
   );
 }
 
-/** Section background tint + hairline divider (featured-projects pattern) */
-export function SectionBackdrop() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-      <div className="absolute inset-0 bg-linear-to-b from-neutral-50/60 via-white/0 to-neutral-50/50" />
-      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-neutral-200 to-transparent" />
-      <div className="absolute -top-8 left-1/2 h-56 w-176 max-w-[90vw] -translate-x-1/2 rounded-full bg-[#6c5ce7]/5 blur-3xl" />
-    </div>
-  );
-}
-
 export const SectionShell = forwardRef<
   HTMLElement,
   { id: string; children: React.ReactNode; className?: string }

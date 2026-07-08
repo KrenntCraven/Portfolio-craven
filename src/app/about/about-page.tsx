@@ -224,14 +224,6 @@ export default function About() {
       if (isSnappingRef.current) return;
 
       const targetNode = e.target as HTMLElement | null;
-      const certEl = targetNode?.closest<HTMLElement>("#certifications");
-      if (certEl) {
-        const hstate = certEl.dataset.hscroll ?? "none";
-        if (hstate !== "none") {
-          if (e.deltaY > 0 && hstate !== "end") return;
-          if (e.deltaY < 0 && hstate !== "start") return;
-        }
-      }
 
       // When the experience card is expanded it can exceed the viewport.
       // Let the section scroll naturally and only snap to the neighbouring

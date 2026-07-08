@@ -105,10 +105,9 @@ describe("About page", () => {
   });
 
   describe("Avatar & logo images", () => {
-    it("renders the profile picture with alt='Avatar'", () => {
+    it("renders the profile picture with alt='Krennt Craven'", () => {
       render(<About />);
-      // There may be more than one Avatar img (about + landing share the same alt on this page)
-      const avatars = screen.getAllByAltText("Avatar");
+      const avatars = screen.getAllByAltText("Krennt Craven");
       expect(avatars.length).toBeGreaterThanOrEqual(1);
     });
 

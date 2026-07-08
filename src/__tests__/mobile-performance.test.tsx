@@ -54,6 +54,8 @@ jest.mock("framer-motion", () => {
   const ReactInternal = require("react");
   return {
     __esModule: true,
+    MotionConfig: ({ children }: { children?: React.ReactNode }) => children,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     motion: new Proxy(
       {},
       {
@@ -63,7 +65,7 @@ jest.mock("framer-motion", () => {
             onAnimationComplete,
             ...rest
           }: Record<string, unknown> & {
-            children?: ReactInternal.ReactNode;
+            children?: React.ReactNode;
             onAnimationComplete?: () => void;
           }) => {
             const clean = Object.fromEntries(
@@ -158,6 +160,13 @@ import {
 import About from "@/app/about/about-page";
 import { aboutMobileParagraphs, aboutParagraphs } from "@/app/about/about-data";
 import LandingPageClient from "@/app/frontend/home/landing-page-client";
+import { ContactModalProvider } from "@/app/frontend/contact-modal/contact-modal-context";
+
+const LandingHero = () => (
+  <ContactModalProvider>
+    <LandingPageClient />
+  </ContactModalProvider>
+);
 
 // ===========================================================================
 // 1 — BannerBackground – touch / reduced-motion detection
@@ -332,7 +341,7 @@ describe("About page – mobile uses native scrolling (no touch snapping)", () =
 describe("LandingPageClient – wheel scroll performance guards", () => {
   it("registers wheel listener with { passive: false }", async () => {
     const addSpy = jest.spyOn(window, "addEventListener");
-    await act(async () => { render(<LandingPageClient />); });
+    await act(async () => { render(<LandingHero />); });
     const wheelCall = addSpy.mock.calls.find(([event]) => event === "wheel");
     expect(wheelCall).toBeDefined();
     expect(wheelCall?.[2]).toEqual({ passive: false });
@@ -341,7 +350,7 @@ describe("LandingPageClient – wheel scroll performance guards", () => {
 
   it("removes wheel listener on unmount (no memory leak)", async () => {
     const removeSpy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = render(<LandingPageClient />);
+    const { unmount } = render(<LandingHero />);
     await act(async () => { unmount(); });
     expect(removeSpy.mock.calls.map(([e]) => e)).toContain("wheel");
     removeSpy.mockRestore();
