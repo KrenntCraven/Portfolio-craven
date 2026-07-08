@@ -1,8 +1,8 @@
-export function getSocials(resumeUrl: string | null) {
-  return socials(resumeUrl);
+export function getSocials() {
+  return socials();
 }
 
-const socials = (resumeUrl: string | null) => [
+const socials = () => [
   {
     label: "GitHub",
     href: "https://github.com/KrenntCraven",
@@ -18,7 +18,7 @@ const socials = (resumeUrl: string | null) => [
   },
   {
     label: "Gmail",
-    href: "mailto:krenntcraven@gmail.com",
+    href: "mailto:krenntc@gmail.com",
     external: false,
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
@@ -44,9 +44,9 @@ const socials = (resumeUrl: string | null) => [
   },
   {
     label: "Resume",
-    href: resumeUrl ?? "/Master-Resume.pdf",
+    href: "/resume.pdf",
     external: true,
-    download: !resumeUrl,
+    download: true,
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
         <path

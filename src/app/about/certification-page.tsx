@@ -1,208 +1,143 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { BannerBackground } from "../frontend/banner-background";
+import {
+  ExternalIcon,
+  FOCUS_RING,
+  fadeUpItem,
+  inViewProps,
+  sectionReveal,
+} from "../frontend/project-ui";
+import { ABOUT_CARD, SectionHeader, SectionShell } from "./about-ui";
 import { certifications } from "./certification-data";
 
-export default function Certification() {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const [maxOffset, setMaxOffset] = useState(0);
-  const x = useMotionValue(0);
-  const xSmooth = useSpring(x, { stiffness: 220, damping: 30, mass: 0.6 });
+type Cert = (typeof certifications)[number];
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const viewport = viewportRef.current;
-    const track = trackRef.current;
-    if (!section || !viewport || !track) return;
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isTouchDragging = false;
-
-    const updateBounds = () => {
-      const max = Math.max(0, track.scrollWidth - viewport.clientWidth);
-      setMaxOffset(max);
-      if (x.get() < -max) x.set(-max);
-    };
-
-    updateBounds();
-    window.addEventListener("resize", updateBounds);
-
-    const handleScroll = (e: WheelEvent) => {
-      const sectionRect = section.getBoundingClientRect();
-
-      // More strict viewport check - section must be more centered
-      const isSectionInView =
-        sectionRect.top < window.innerHeight * 0.4 &&
-        sectionRect.bottom > window.innerHeight * 0.6;
-
-      if (!isSectionInView) return;
-
-      if (maxOffset <= 0) return;
-
-      const deltaX = e.deltaX;
-      const deltaY = e.deltaY;
-
-      // Use both deltaX and deltaY for horizontal scrolling (trackpad/mouse)
-      const delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
-
-      if (delta === 0) return;
-
-      // Check boundaries
-      const currentX = x.get();
-      const isAtStart = currentX >= -5;
-      const isAtEnd = currentX <= -maxOffset + 5;
-
-      // Allow vertical scroll when at boundaries
-      if ((isAtStart && delta < 0) || (isAtEnd && delta > 0)) {
-        return;
-      }
-
-      // Hijack scroll within bounds
-      e.preventDefault();
-      const next = currentX - delta;
-      const clamped = Math.max(-maxOffset, Math.min(0, next));
-      x.set(clamped);
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      isTouchDragging = true;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isTouchDragging || e.touches.length !== 1) return;
-
-      const sectionRect = section.getBoundingClientRect();
-      const isSectionInView =
-        sectionRect.top < window.innerHeight * 0.7 &&
-        sectionRect.bottom > window.innerHeight * 0.3;
-      if (!isSectionInView || maxOffset <= 0) return;
-
-      const deltaX = e.touches[0].clientX - touchStartX;
-      const deltaY = e.touches[0].clientY - touchStartY;
-
-      if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
-
-      e.preventDefault();
-      const next = x.get() + deltaX;
-      const clamped = Math.max(-maxOffset, Math.min(0, next));
-      x.set(clamped);
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = () => {
-      isTouchDragging = false;
-    };
-
-    section.addEventListener("wheel", handleScroll, { passive: false });
-    section.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    section.addEventListener("touchmove", handleTouchMove, { passive: false });
-    section.addEventListener("touchend", handleTouchEnd);
-    section.addEventListener("touchcancel", handleTouchEnd);
-
-    return () => {
-      section.removeEventListener("wheel", handleScroll);
-      section.removeEventListener("touchstart", handleTouchStart);
-      section.removeEventListener("touchmove", handleTouchMove);
-      section.removeEventListener("touchend", handleTouchEnd);
-      section.removeEventListener("touchcancel", handleTouchEnd);
-      window.removeEventListener("resize", updateBounds);
-    };
-  }, [maxOffset, x]);
-
+function VerifiedIcon({ className }: { className?: string }) {
   return (
-    <section
-      id="certifications"
-      ref={sectionRef}
-      className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pt-24"
-    >
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="mb-10 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-14"
-      >
-        Certifications
-      </motion.h1>
-      <div className="relative min-h-[420px]">
-        {/* Edge fade */}
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-white to-transparent z-10" />
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-white to-transparent z-10" />
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2 9.8 3.6 7.1 3.3 6 5.8 3.5 6.9l.3 2.7L2.2 12l1.6 2.4-.3 2.7 2.5 1.1 1.1 2.5 2.7-.3L12 22l2.2-1.6 2.7.3 1.1-2.5 2.5-1.1-.3-2.7L21.8 12l-1.6-2.4.3-2.7-2.5-1.1L16.9 3.3l-2.7.3L12 2Zm-1.2 13.2-3-3 1.3-1.3 1.7 1.7 4-4L16 9.6l-5.2 5.6Z" />
+    </svg>
+  );
+}
 
-        <div ref={viewportRef} className="overflow-hidden pb-6 px-2 sm:px-4">
-          <motion.div
-            ref={trackRef}
-            style={{ x: xSmooth }}
-            className="flex gap-6"
-          >
-            {certifications.map((c, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.05 }}
-                className="relative min-w-[280px] sm:min-w-[320px] lg:min-w-[320px] rounded-2xl border border-black/10 bg-white p-6 shadow-[0_16px_50px_-30px_rgba(0,0,0,0.45)] transition-transform duration-200 hover:-translate-y-1 hover:border-black/20 hover:z-10 cursor-pointer"
-              >
-                {c.link ? (
-                  <a
-                    href={c.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center text-center gap-3 focus:outline-none focus:ring-0 rounded-2xl"
-                    tabIndex={0}
-                  >
-                    <div className="relative h-32 w-32 select-none sm:h-36 sm:w-36 lg:h-44 lg:w-44">
-                      <Image
-                        src={c.badge}
-                        alt={`${c.title} badge`}
-                        fill
-                        className="object-contain select-none pointer-events-none"
-                        draggable={false}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
-                        {c.title}
-                      </h3>
-                      <p className="text-md text-neutral-600">{c.issuer}</p>
-                      <p className="text-s text-neutral-500">{c.date}</p>
-                    </div>
-                  </a>
-                ) : (
-                  <div className="flex flex-col items-center text-center gap-3">
-                    <div className="relative h-32 w-32 select-none sm:h-36 sm:w-36 lg:h-44 lg:w-44">
-                      <Image
-                        src={c.badge}
-                        alt={`${c.title} badge`}
-                        fill
-                        className="object-contain select-none pointer-events-none"
-                        draggable={false}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-base font-semibold text-neutral-800 sm:text-lg">
-                        {c.title}
-                      </h3>
-                      <p className="text-md text-neutral-600">{c.issuer}</p>
-                      <p className="text-s text-neutral-500">{c.date}</p>
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
+function CertCard({ cert }: { cert: Cert }) {
+  const inner = (
+    <>
+      <span
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-linear-to-r from-[#6c5ce7] to-[#a29bfe] transition-transform duration-300 ease-out group-hover:scale-x-100"
+      />
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-[#6c5ce7]/0 transition-colors duration-300 group-hover:bg-[#6c5ce7]/4"
+      />
+
+      <div className="relative flex items-start gap-4 sm:gap-5">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50/80 p-2 sm:h-24 sm:w-24">
+          <div className="relative h-full w-full">
+            <Image
+              src={cert.badge}
+              alt={`${cert.title} badge`}
+              fill
+              sizes="96px"
+              className="pointer-events-none select-none object-contain transition-transform duration-300 group-hover:scale-105"
+              draggable={false}
+            />
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-neutral-200 bg-white px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-neutral-600">
+              {cert.issuer}
+            </span>
+            <span className="text-xs font-medium tabular-nums text-neutral-400">
+              {cert.date}
+            </span>
+          </div>
+
+          <h3 className="text-[15px] font-semibold leading-snug text-neutral-900 sm:text-base">
+            {cert.title}
+          </h3>
+
+          {cert.link ? (
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6c5ce7]">
+              View credential
+              <ExternalIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500">
+              <VerifiedIcon className="h-3.5 w-3.5 text-[#6c5ce7]" />
+              Verified
+            </span>
+          )}
         </div>
       </div>
-    </section>
+    </>
+  );
+
+  const cardClass = `group relative block overflow-hidden ${ABOUT_CARD} p-5 sm:p-6 hover:border-[#6c5ce7]/30 hover:shadow-[0_28px_70px_-32px_rgba(108,92,231,0.35)]`;
+
+  return (
+    <motion.div variants={fadeUpItem} whileHover={{ y: -4 }} transition={{ duration: 0.25 }}>
+      {cert.link ? (
+        <a
+          href={cert.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${cardClass} ${FOCUS_RING}`}
+        >
+          {inner}
+        </a>
+      ) : (
+        <div className={cardClass}>{inner}</div>
+      )}
+    </motion.div>
+  );
+}
+
+export default function Certification() {
+  const verifiedCount = certifications.length;
+
+  return (
+    <div className="relative overflow-hidden bg-white">
+      <BannerBackground />
+
+      <SectionShell id="certifications">
+        <SectionHeader
+          eyebrow="Credentials"
+          title="Certifications"
+          subtitle="Certified across AWS, GCP, and Azure."
+        />
+
+        <motion.div
+          {...inViewProps}
+          variants={sectionReveal}
+          className="mx-auto max-w-5xl"
+        >
+          <motion.p
+            variants={fadeUpItem}
+            className="mb-6 text-center text-sm text-neutral-500 sm:mb-8"
+          >
+            <span className="font-semibold text-neutral-800">
+              {certifications.length}
+            </span>{" "}
+            certifications
+            <span className="mx-2 text-neutral-300">·</span>
+            <span className="font-semibold text-neutral-800">{verifiedCount}</span>{" "}
+            independently verifiable
+          </motion.p>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
+            {certifications.map((c) => (
+              <CertCard key={c.title} cert={c} />
+            ))}
+          </div>
+        </motion.div>
+      </SectionShell>
+    </div>
   );
 }

@@ -83,8 +83,7 @@ jest.mock("@/app/frontend/banner-background", () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 
-const renderWithUrl = (resumeUrl: string | null) =>
-  render(<LandingPageClient resumeUrl={resumeUrl} />);
+const renderWithUrl = () => render(<LandingPageClient />);
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -93,21 +92,21 @@ const renderWithUrl = (resumeUrl: string | null) =>
 describe("LandingPageClient", () => {
   describe("Hero heading & intro text", () => {
     it("renders the name introduction text", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(
         screen.getByText(/Hello, I'm Krennt Craven/i)
       ).toBeInTheDocument();
     });
 
     it("renders the main h1 heading", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(
         screen.getByRole("heading", { level: 1 })
       ).toHaveTextContent(/Software Engineer Focused on Reliable Web and Mobile Solutions/i);
     });
 
     it("renders the tagline paragraph", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(
         screen.getByText(/I turn ideas into scalable, real-world applications/i)
       ).toBeInTheDocument();
@@ -116,52 +115,43 @@ describe("LandingPageClient", () => {
 
   describe("Avatar image", () => {
     it("renders the profile picture with an accessible alt text", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.getByAltText("Avatar")).toBeInTheDocument();
     });
   });
 
   describe("Social / action buttons", () => {
     it("renders the GitHub button", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.getByText("GitHub")).toBeInTheDocument();
     });
 
     it("renders the LinkedIn button", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.getByText("LinkedIn")).toBeInTheDocument();
     });
 
     it("renders the Gmail button", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.getByText("Gmail")).toBeInTheDocument();
     });
 
     it("renders the Resume button", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.getByText("Resume")).toBeInTheDocument();
     });
 
     it("does NOT render the Facebook button (filtered out)", () => {
-      renderWithUrl(null);
+      renderWithUrl();
       expect(screen.queryByText("Facebook")).not.toBeInTheDocument();
     });
   });
 
-  describe("Resume URL prop", () => {
-    it("uses the provided Contentful resume URL for the Resume button href", () => {
-      renderWithUrl("https://cdn.contentful.com/my-resume.pdf");
+  describe("Resume link", () => {
+    it("points the Resume button to the self-hosted /resume.pdf", () => {
+      renderWithUrl();
       const resumeLink = screen.getByText("Resume").closest("a");
-      expect(resumeLink).toHaveAttribute(
-        "href",
-        "https://cdn.contentful.com/my-resume.pdf"
-      );
-    });
-
-    it("falls back to /Master-Resume.pdf when resumeUrl is null", () => {
-      renderWithUrl(null);
-      const resumeLink = screen.getByText("Resume").closest("a");
-      expect(resumeLink).toHaveAttribute("href", "/Master-Resume.pdf");
+      expect(resumeLink).toHaveAttribute("href", "/resume.pdf");
     });
   });
 });

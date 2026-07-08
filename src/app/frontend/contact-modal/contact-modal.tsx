@@ -1,7 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { ArrowRightIcon, EASE, FOCUS_RING } from "../project-ui";
+import { getSocials } from "../home/socials-link";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -9,6 +12,30 @@ interface ContactModalProps {
 }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* Staggered entrance for the form fields */
+const fieldStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
+};
+const fieldItem = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
+/* The real email + a couple of icon links for the footer */
+const EMAIL = "krenntc@gmail.com";
+const ICON_LINKS = getSocials().filter((s) =>
+  ["GitHub", "LinkedIn"].includes(s.label),
+);
+
+function inputClasses(hasError: boolean) {
+  return `w-full rounded-xl border bg-white/70 px-4 py-3 text-sm text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 sm:text-base ${
+    hasError
+      ? "border-red-300 bg-red-50/60 focus:border-red-400 focus:ring-red-200"
+      : "border-black/10 hover:border-[#6c5ce7]/40 focus:border-[#6c5ce7] focus:ring-[#6c5ce7]/20"
+  }`;
+}
 
 export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
   const [formData, setFormData] = useState({
@@ -25,6 +52,29 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const closeTimerRef = useRef<number | null>(null);
+
+  // Reset everything whenever the modal closes so reopening is always fresh
+  // (and any pending auto-close timer is cancelled).
+  useEffect(() => {
+    if (isOpen) return;
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setIsSubmitted(false);
+    setFormData({ name: "", email: "", message: "" });
+    setErrors({ name: "", email: "", message: "" });
+    setSubmitError("");
+  }, [isOpen]);
+
+  // Move focus into the dialog when it opens
+  useEffect(() => {
+    if (!isOpen) return;
+    const id = window.setTimeout(() => nameInputRef.current?.focus(), 120);
+    return () => window.clearTimeout(id);
+  }, [isOpen]);
 
   // Close on outside click
   useEffect(() => {
@@ -108,11 +158,11 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
       }
 
       setIsSubmitted(true);
-      setTimeout(() => {
-        setFormData({ name: "", email: "", message: "" });
-        setIsSubmitted(false);
+      // Give the reader time to enjoy the message; they can also dismiss
+      // early via outside click, Escape, or the close button.
+      closeTimerRef.current = window.setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 6000);
     } catch (err) {
       setSubmitError(
         err instanceof Error
@@ -146,42 +196,43 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm"
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-[101] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div
+            className="fixed inset-0 z-101 flex items-center justify-center overflow-y-auto p-3 sm:p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Contact Krennt Craven"
+          >
             <motion.div
               ref={modalRef}
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              initial={{ opacity: 0, scale: 0.97, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{
-                type: "spring",
-                damping: 25,
-                stiffness: 300,
-                duration: 0.4,
-              }}
-              className="relative w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] my-auto rounded-xl sm:rounded-2xl border border-black/10 bg-white/95 shadow-2xl shadow-black/20 backdrop-blur-xl flex flex-col overflow-hidden"
+              exit={{ opacity: 0, scale: 0.97, y: 12 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
+              className="relative my-auto w-full max-w-lg overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-2xl shadow-black/20 sm:p-8"
             >
-              {/* Background decorations */}
-              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl sm:rounded-2xl">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.03),transparent_30%)]" />
-                <div className="absolute inset-x-0 top-0 h-20 sm:h-32 bg-linear-to-b from-black/5 via-transparent to-transparent" />
-              </div>
+              {/* Thin accent line — the only decorative flourish */}
+              <span
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]"
+              />
 
-              {/* Close Button */}
+              {/* Close */}
               <button
                 onClick={onClose}
-                className="absolute top-2 right-2 sm:top-3 sm:right-3 z-30 p-2 sm:p-2.5 rounded-lg bg-white/90 backdrop-blur-sm border border-black/10 hover:bg-white hover:border-black/20 transition-all duration-200 shadow-sm hover:shadow-md"
-                aria-label="Close modal"
+                aria-label="Close contact form"
+                className={`absolute right-3 top-3 rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 ${FOCUS_RING}`}
               >
                 <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-700"
+                  className="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  strokeWidth={2.5}
+                  strokeWidth={2}
+                  aria-hidden
                 >
                   <path
                     strokeLinecap="round"
@@ -191,231 +242,294 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                 </svg>
               </button>
 
-              {/* Scrollable Content */}
-              <div className="relative z-10 p-4 sm:p-6 lg:p-8 overflow-y-auto flex-1 min-h-0">
-                {/* Header */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="mb-4 sm:mb-6 pr-10 sm:pr-12"
-                >
-                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
-                    Contact me
-                  </h2>
-                  <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-neutral-600 leading-relaxed">
-                    Drop a message and let's connect. collaboration, Drop a
-                    message and let's connect.
-                  </p>
-                </motion.div>
-
-                {/* Success Message */}
-                <AnimatePresence>
-                  {isSubmitted && (
+              <AnimatePresence mode="wait">
+                {isSubmitted ? (
+                  /* ---------- Success ---------- */
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, ease: EASE }}
+                    className="flex flex-col items-center py-8 text-center"
+                  >
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-4 sm:mt-6 rounded-lg sm:rounded-xl bg-green-50 border border-green-200 p-3 sm:p-4 text-center"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: "spring",
+                        delay: 0.05,
+                        stiffness: 220,
+                        damping: 16,
+                      }}
+                      className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-[#6c5ce7] to-[#a29bfe] text-white shadow-lg shadow-[#6c5ce7]/25"
                     >
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{
-                          type: "spring",
-                          delay: 0.1,
-                          stiffness: 200,
-                        }}
-                        className="mx-auto mb-2 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-green-500"
+                      <svg
+                        className="h-7 w-7"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden
                       >
-                        <svg
-                          className="h-5 w-5 sm:h-6 sm:w-6 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2.5}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </motion.div>
+                    <h3 className="text-lg font-bold tracking-tight text-neutral-900">
+                      Delivered successfully.
+                    </h3>
+                    <p className="mt-1 text-sm italic text-[#6c5ce7]">
+                      (Unlike some of my API integrations.)
+                    </p>
+                    <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-neutral-600">
+                      Your note came straight to me. I&apos;ll read it and write
+                      back.
+                    </p>
+                    <p className="mt-3 text-sm font-medium text-neutral-400">
+                      — Krennt
+                    </p>
+                  </motion.div>
+                ) : (
+                  /* ---------- Form ---------- */
+                  <motion.div
+                    key="form"
+                    variants={fieldStagger}
+                    initial="hidden"
+                    animate="show"
+                  >
+                    {/* Header — who you're actually reaching */}
+                    <motion.div variants={fieldItem} className="mb-6 pr-8">
+                      <div className="flex items-center gap-3">
+                        <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-black/10">
+                          <Image
+                            src="/Picture.jpg"
+                            alt="Krennt Craven"
+                            fill
+                            sizes="44px"
+                            className="object-cover"
                           />
-                        </svg>
-                      </motion.div>
-                      <p className="text-xs sm:text-sm font-semibold text-green-800">
-                        Message sent successfully!
+                        </span>
+                        <span className="leading-tight">
+                          <span className="block text-sm font-semibold text-neutral-900">
+                            Krennt Craven
+                          </span>
+                          <span className="block text-xs text-neutral-500">
+                            Full-stack &amp; cloud engineer
+                          </span>
+                        </span>
+                      </div>
+                      <h2 className="mt-5 text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+                        Let&apos;s talk.
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-600 sm:text-base">
+                        A product to build, a system to scale, or an infra
+                        headache to untangle — send it over. It comes straight to
+                        me, and I reply to everyone.
                       </p>
                     </motion.div>
-                  )}
-                </AnimatePresence>
 
-                {/* Form */}
-                {!isSubmitted && (
-                  <motion.form
-                    onSubmit={handleSubmit}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="mt-4 sm:mt-6 space-y-4 sm:space-y-5"
-                  >
-                    {/* Name Field */}
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.25 }}
-                    >
-                      <label
-                        htmlFor="name"
-                        className="block text-xs sm:text-sm font-semibold text-neutral-800 mb-1.5 sm:mb-2"
-                      >
-                        Name:
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className={`w-full rounded-lg sm:rounded-xl border ${
-                          errors.name
-                            ? "border-red-300 bg-red-50"
-                            : "border-black/15 bg-white/80"
-                        } px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 focus:border-black/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10`}
-                        placeholder="Your Name:"
-                      />
-
-                      {errors.name && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1 text-xs sm:text-sm text-red-600"
+                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                      {/* Name */}
+                      <motion.div variants={fieldItem}>
+                        <label
+                          htmlFor="name"
+                          className="mb-1.5 block text-sm font-medium text-neutral-700"
                         >
-                          {errors.name}
-                        </motion.p>
-                      )}
-                    </motion.div>
-
-                    {/* Email Field */}
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      <label
-                        htmlFor="email"
-                        className="block text-xs sm:text-sm font-semibold text-neutral-800 mb-1.5 sm:mb-2"
-                      >
-                        Email:
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className={`w-full rounded-lg sm:rounded-xl border ${
-                          errors.email
-                            ? "border-red-300 bg-red-50"
-                            : "border-black/15 bg-white/80"
-                        } px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 focus:border-black/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10`}
-                        placeholder="your.email@example.com"
-                      />
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1 text-xs sm:text-sm text-red-600"
-                        >
-                          {errors.email}
-                        </motion.p>
-                      )}
-                    </motion.div>
-
-                    {/* Message Field */}
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.35 }}
-                    >
-                      <label
-                        htmlFor="message"
-                        className="block text-xs sm:text-sm font-semibold text-neutral-800 mb-1.5 sm:mb-2"
-                      >
-                        Message:
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={4}
-                        className={`w-full rounded-lg sm:rounded-xl border ${
-                          errors.message
-                            ? "border-red-300 bg-red-50"
-                            : "border-black/15 bg-white/80"
-                        } px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 focus:border-black/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black/10 resize-none`}
-                        placeholder="Tell me a bit about what you'd like to discuss.."
-                      />
-                      {errors.message && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-1 text-xs sm:text-sm text-red-600"
-                        >
-                          {errors.message}
-                        </motion.p>
-                      )}
-                    </motion.div>
-
-                    {/* Submit error */}
-                    {submitError && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs sm:text-sm text-red-600 text-center"
-                      >
-                        {submitError}
-                      </motion.p>
-                    )}
-
-                    {/* Buttons */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end sm:gap-4 pt-3 sm:pt-4"
-                    >
-                      <motion.button
-                        type="button"
-                        onClick={onClose}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full sm:w-auto rounded-lg sm:rounded-xl border border-black/15 bg-white/80 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-all duration-200 hover:bg-white hover:border-black/25 hover:shadow-md"
-                      >
-                        Cancel
-                      </motion.button>
-                      <motion.button
-                        type="submit"
-                        disabled={isSubmitting}
-                        whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                        className="group relative w-full sm:w-auto overflow-hidden rounded-lg sm:rounded-xl border border-black/10 bg-neutral-800 px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-black/20 transition-all duration-300 hover:bg-white hover:border-black/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <motion.span
-                          className="pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0"
-                          initial={{ scale: 1 }}
-                          whileHover={{ opacity: 1, scale: 1.1 }}
-                          transition={{ duration: 0.4 }}
+                          Name
+                        </label>
+                        <input
+                          ref={nameInputRef}
+                          type="text"
+                          id="name"
+                          name="name"
+                          autoComplete="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          aria-invalid={!!errors.name}
+                          className={inputClasses(!!errors.name)}
+                          placeholder="Your name"
                         />
-                        <span className="relative z-10 transition-colors duration-300 group-hover:text-neutral-800">
-                          {isSubmitting ? "Sending..." : "Submit"}
-                        </span>
-                      </motion.button>
+                        <AnimatePresence>
+                          {errors.name && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              className="mt-1.5 text-xs text-red-600"
+                            >
+                              {errors.name}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+
+                      {/* Email */}
+                      <motion.div variants={fieldItem}>
+                        <label
+                          htmlFor="email"
+                          className="mb-1.5 block text-sm font-medium text-neutral-700"
+                        >
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          autoComplete="email"
+                          inputMode="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          aria-invalid={!!errors.email}
+                          className={inputClasses(!!errors.email)}
+                          placeholder="you@example.com"
+                        />
+                        <AnimatePresence>
+                          {errors.email && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              className="mt-1.5 text-xs text-red-600"
+                            >
+                              {errors.email}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+
+                      {/* Message */}
+                      <motion.div variants={fieldItem}>
+                        <label
+                          htmlFor="message"
+                          className="mb-1.5 block text-sm font-medium text-neutral-700"
+                        >
+                          Message
+                        </label>
+                        <textarea
+                          id="message"
+                          name="message"
+                          value={formData.message}
+                          onChange={handleChange}
+                          rows={4}
+                          aria-invalid={!!errors.message}
+                          className={`${inputClasses(!!errors.message)} resize-none`}
+                          placeholder="What are you building, and where do I fit in?"
+                        />
+                        <AnimatePresence>
+                          {errors.message && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              className="mt-1.5 text-xs text-red-600"
+                            >
+                              {errors.message}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+
+                      {/* Submit error */}
+                      <AnimatePresence>
+                        {submitError && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -4 }}
+                            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600"
+                          >
+                            {submitError}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Submit */}
+                      <motion.div variants={fieldItem} className="pt-1">
+                        <motion.button
+                          type="submit"
+                          disabled={isSubmitting}
+                          whileHover={isSubmitting ? undefined : { y: -2 }}
+                          whileTap={isSubmitting ? undefined : { scale: 0.99 }}
+                          className={`group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS_RING}`}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <svg
+                                className="h-4 w-4 animate-spin"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-90"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                />
+                              </svg>
+                              Sending…
+                            </>
+                          ) : (
+                            <>
+                              Send message
+                              <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </>
+                          )}
+                        </motion.button>
+                      </motion.div>
+                    </form>
+
+                    {/* Direct line — a real address, not an anonymous form */}
+                    <motion.div
+                      variants={fieldItem}
+                      className="mt-6 flex flex-col gap-3 border-t border-neutral-100 pt-5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <a
+                        href={`mailto:${EMAIL}`}
+                        className={`inline-flex items-center gap-2 rounded text-sm font-medium text-neutral-600 transition-colors hover:text-[#6c5ce7] ${FOCUS_RING}`}
+                      >
+                        <svg
+                          className="h-4 w-4 text-neutral-400"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-hidden
+                        >
+                          <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h2V9.5l6 4 6-4V20h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm-2 3.5-6 4-6-4V6l6 4 6-4Z" />
+                        </svg>
+                        {EMAIL}
+                      </a>
+                      <div className="flex items-center gap-2">
+                        {ICON_LINKS.map((link) => (
+                          <motion.a
+                            key={link.label}
+                            href={link.href}
+                            aria-label={link.label}
+                            title={link.label}
+                            whileHover={{ y: -2 }}
+                            whileTap={{ scale: 0.95 }}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border border-black/10 bg-white text-neutral-600 transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] ${FOCUS_RING}`}
+                          >
+                            {link.icon}
+                          </motion.a>
+                        ))}
+                      </div>
                     </motion.div>
-                  </motion.form>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </motion.div>
           </div>
         </>

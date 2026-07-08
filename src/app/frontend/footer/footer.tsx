@@ -15,11 +15,12 @@ import { usePageTransition } from "../page-transition/page-transition";
 // Socials and navigation links
 import { getSocials } from "../home/socials-link";
 
-const socials = getSocials(null);
+const socials = getSocials();
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/#projects", label: "Projects" },
+  { href: "/#projects", label: "Featured" },
+  { href: "/projects", label: "Projects" },
   { href: "/about", label: "About" },
   { href: "/#contact", label: "Contact me" },
 ];

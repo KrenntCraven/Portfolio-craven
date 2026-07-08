@@ -6,19 +6,11 @@ export interface TechCategory {
 export const technologies: TechCategory[] = [
   {
     title: "Languages",
-    items: ["TypeScript", "JavaScript", "Java", "Python", "SQL", "C#", "C++"],
+    items: ["TypeScript", "JavaScript", "Java", "Python", "SQL", "C#"],
   },
   {
     title: "Backend",
-    items: [
-      "Node.js",
-      "Express.js",
-      "Firebase",
-      "Supabase",
-      "REST APIs",
-      "ASP.NET",
-      "PHP",
-    ],
+    items: ["Node.js", "ASP.NET", "PHP", "REST APIs", "Firebase", "Supabase"],
   },
   {
     title: "Frontend",
@@ -26,12 +18,10 @@ export const technologies: TechCategory[] = [
       "React",
       "Next.js",
       "React Native",
-      "Expo",
-      "Angular",
       "Flutter",
+      "Tailwind CSS",
       "HTML",
       "CSS",
-      "Tailwind CSS",
     ],
   },
   {

@@ -332,7 +332,7 @@ describe("About page – mobile uses native scrolling (no touch snapping)", () =
 describe("LandingPageClient – wheel scroll performance guards", () => {
   it("registers wheel listener with { passive: false }", async () => {
     const addSpy = jest.spyOn(window, "addEventListener");
-    await act(async () => { render(<LandingPageClient resumeUrl={null} />); });
+    await act(async () => { render(<LandingPageClient />); });
     const wheelCall = addSpy.mock.calls.find(([event]) => event === "wheel");
     expect(wheelCall).toBeDefined();
     expect(wheelCall?.[2]).toEqual({ passive: false });
@@ -341,7 +341,7 @@ describe("LandingPageClient – wheel scroll performance guards", () => {
 
   it("removes wheel listener on unmount (no memory leak)", async () => {
     const removeSpy = jest.spyOn(window, "removeEventListener");
-    const { unmount } = render(<LandingPageClient resumeUrl={null} />);
+    const { unmount } = render(<LandingPageClient />);
     await act(async () => { unmount(); });
     expect(removeSpy.mock.calls.map(([e]) => e)).toContain("wheel");
     removeSpy.mockRestore();

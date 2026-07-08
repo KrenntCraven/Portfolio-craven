@@ -1,0 +1,27 @@
+#!/bin/sh
+# Strip AI-tool trailers (Cursor / GitHub Copilot) from commit messages.
+# Runs on every commit regardless of how it was created.
+
+msg_file="$1"
+[ -f "$msg_file" ] || exit 0
+
+# Remove:
+#  - Co-authored-by lines referencing Cursor or Copilot
+#  - "Generated with ... Cursor/Copilot" lines
+#  - Cursor/Copilot bot signature lines (e.g. "🤖 Generated with ...")
+sed -i \
+  -e '/^[[:space:]]*Co-authored-by:.*[Cc]ursor.*$/d' \
+  -e '/^[[:space:]]*Co-authored-by:.*[Cc]opilot.*$/d' \
+  -e '/[Gg]enerated with.*\[*[Cc]ursor/d' \
+  -e '/[Gg]enerated with.*\[*[Cc]opilot/d' \
+  -e '/^[[:space:]]*🤖[[:space:]]*Generated with/d' \
+  "$msg_file"
+
+# Collapse trailing blank lines left behind after removals.
+# Reads whole file, strips trailing empty lines, adds single newline.
+tmp_file="$msg_file.tmp.$$"
+awk 'BEGIN{blanks=0}
+     { if ($0 ~ /^[[:space:]]*$/) { blanks++ } else { for(i=0;i<blanks;i++) print ""; blanks=0; print } }' \
+  "$msg_file" > "$tmp_file" && mv "$tmp_file" "$msg_file"
+
+exit 0

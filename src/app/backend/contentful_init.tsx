@@ -69,6 +69,7 @@ async function _getFeaturedProjects(): Promise<Project[]> {
           ? `https:${item.fields.coverPage.fields.file.url}`
           : undefined,
       projectType: item.fields.projectType,
+      technologies: item.fields.technologies,
       keyFeatures: item.fields.keyFeatures || [],
       role: item.fields.role,
       caseStudy: item.fields.caseStudy,
@@ -141,34 +142,5 @@ export function getProjectBySlug(slug: string): Promise<Project | null> {
     tags: [`project-${slug}`, "projects"],
   })();
 }
-
-interface ResumeEntryFields {
-  resumeFile: EntryFieldTypes.AssetLink;
-}
-
-interface ResumeEntrySkeleton {
-  contentTypeId: "resume";
-  fields: ResumeEntryFields;
-}
-
-async function _getResumeUrl(): Promise<string | null> {
-  const entries = await client.getEntries<ResumeEntrySkeleton>({
-    content_type: "resume",
-    limit: 1,
-  });
-
-  const item = entries.items[0];
-  if (!item) return null;
-
-  const file = item.fields.resumeFile;
-  if (!isAsset(file) || !file.fields?.file?.url) return null;
-
-  return `https:${file.fields.file.url}`;
-}
-
-export const getResumeUrl = unstable_cache(_getResumeUrl, ["resume-url"], {
-  revalidate: 3600,
-  tags: ["resume"],
-});
 
 export default client;
