@@ -1,11 +1,11 @@
 export const aboutParagraphs: string[] = [
-  "I started with a foundation in Computer Engineering, where I developed strong foundation on problem-solving and software development focused on real-world impact.",
-  "Through internships and early roles, I worked on both internal tools and user-facing applications, gaining experience in frontend, backend, and cloud technologies.",
-  "Today, I build reliable and maintainable applications using modern frameworks, guided by clean architecture and scalable design principles.",
+  "I studied Computer Engineering at Pamantasan ng Lungsod ng Maynila, where I first learned to break down real problems instead of just writing code that compiles.",
+  "That habit carried into internships at Willis Towers Watson and GCash, then into my current role at Amdocs, where I've maintained systems supporting 20,000+ agents and migrated a legacy billing platform serving over a million customers to AWS.",
+  "Somewhere along the way, full-stack development stopped being just \"frontend or backend\" and became \"whatever the system actually needs\" — which is how I ended up spending as much time in AWS and cloud infrastructure as I do writing application code.",
 ];
 
 export const aboutMobileParagraphs: string[] = [
-  "A Computer Engineering Graduate with hands-on experience in full-stack web development, cloud computing, and scalable system design.",
-  "Built internal tools and user-facing applications using modern frontend, backend, and cloud technologies.",
-  "Focused on clean architecture, performance, and maintainable software for real-world impact.",
+  "I studied Computer Engineering at Pamantasan ng Lungsod ng Maynila, where I learned to break down real problems — not just write code that compiles.",
+  "That carried into internships at Willis Towers Watson and GCash, then Amdocs, where I've maintained systems for 20,000+ agents and migrated a million-customer billing platform to AWS.",
+  "Full-stack stopped being \"frontend or backend\" and became whatever the system needs — so I spend as much time in AWS and cloud infrastructure as in application code.",
 ];

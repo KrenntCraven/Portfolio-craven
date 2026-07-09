@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getFeaturedProjects, getProjectBySlug } from "../../../backend/contentful_init";
+import { creativeWorkSchema, JsonLd } from "../../../seo";
 import CaseStudyPageClient from "./CaseStudyPageClient";
 
 export const revalidate = 3600;
@@ -20,12 +21,19 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) return {};
+  const description =
+    project.headline ?? `Case study for ${project.title} by Krennt Craven.`;
   return {
-    title: `Case Study: ${project.title} | Krennt Craven`,
-    description: project.headline ?? `Case study for ${project.title} by Krennt Craven.`,
+    title: `Case Study: ${project.title}`,
+    description,
+    alternates: {
+      canonical: `/projects/${slug}/casestudy`,
+    },
     openGraph: {
-      title: `Case Study: ${project.title}`,
-      description: project.headline ?? `Case study for ${project.title}.`,
+      title: `Case Study: ${project.title} | Krennt Craven`,
+      description,
+      url: `/projects/${slug}/casestudy`,
+      type: "article",
       ...(project.coverPageUrl && { images: [{ url: project.coverPageUrl }] }),
     },
   };
@@ -41,5 +49,20 @@ export default async function CaseStudyPage({
 
   if (!project) notFound();
 
-  return <CaseStudyPageClient project={project} />;
+  return (
+    <>
+      <JsonLd
+        schema={creativeWorkSchema({
+          title: `Case Study: ${project.title}`,
+          description:
+            project.headline ??
+            `Case study for ${project.title} by Krennt Craven.`,
+          path: `/projects/${slug}/casestudy`,
+          image: project.coverPageUrl,
+          isCaseStudy: true,
+        })}
+      />
+      <CaseStudyPageClient project={project} />
+    </>
+  );
 }

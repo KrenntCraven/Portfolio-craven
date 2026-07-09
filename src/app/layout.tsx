@@ -5,6 +5,14 @@ import { ContactModalProvider } from "./frontend/contact-modal/contact-modal-con
 import FooterLazy from "./frontend/footer/footer-lazy";
 import NavigationBar from "./frontend/navigation-bar/navbar";
 import { PageTransitionProvider } from "./frontend/page-transition/page-transition";
+import {
+  AUTHOR_NAME,
+  JsonLd,
+  personSchema,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  websiteSchema,
+} from "./seo";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -21,30 +29,66 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://krenntcraven.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Krennt Craven",
+    default: "Krennt Craven — Full-Stack & Cloud Engineer",
     template: "%s | Krennt Craven",
   },
-  description: "Krennt Craven's Personal Portfolio Website",
+  description: SITE_DESCRIPTION,
+  applicationName: "Krennt Craven Portfolio",
+  authors: [{ name: AUTHOR_NAME, url: SITE_URL }],
+  creator: AUTHOR_NAME,
+  publisher: AUTHOR_NAME,
+  keywords: [
+    "Krennt Craven",
+    "Krennt Craven portfolio",
+    "Krennt Craven software engineer",
+    "Krennt Craven developer",
+    "full-stack engineer",
+    "cloud engineer",
+    "software engineer Philippines",
+    "AWS engineer",
+    "React developer",
+    "Next.js developer",
+  ],
+  category: "technology",
   alternates: {
     canonical: "/",
   },
   icons: {
     icon: "/Logo.svg",
+    shortcut: "/Logo.svg",
+    apple: "/Logo.svg",
   },
   openGraph: {
-    title: "Krennt Craven",
-    description: "Krennt Craven's Personal Portfolio Website",
-    url: "https://krenntcraven.com",
+    title: "Krennt Craven — Full-Stack & Cloud Engineer",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
     siteName: "Krennt Craven",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Krennt Craven",
-    description: "Krennt Craven's Personal Portfolio Website",
+    title: "Krennt Craven — Full-Stack & Cloud Engineer",
+    description: SITE_DESCRIPTION,
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // Set GOOGLE_SITE_VERIFICATION in the environment to render the
+  // Search Console verification meta tag (harmless when unset).
+  ...(process.env.GOOGLE_SITE_VERIFICATION && {
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
+  }),
 };
 
 export default function RootLayout({
@@ -57,6 +101,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} font-sans antialiased flex flex-col min-h-screen`}
       >
+        <JsonLd schema={[personSchema, websiteSchema]} />
         <PageTransitionProvider disableOnPaths={["/projects"]}>
           <ContactModalProvider>
             <NavigationBar />
