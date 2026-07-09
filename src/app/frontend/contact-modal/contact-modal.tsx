@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowRightIcon, EASE, FOCUS_RING } from "../project-ui";
 import { getSocials } from "../home/socials-link";
+import { useKeyboardInset } from "../hooks/use-keyboard-inset";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ const ICON_LINKS = getSocials().filter((s) =>
 );
 
 function inputClasses(hasError: boolean) {
-  return `w-full rounded-xl border bg-white/70 px-4 py-3 text-sm text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 sm:text-base ${
+  return `w-full rounded-xl border bg-white/70 px-4 py-3 text-base text-neutral-900 shadow-sm backdrop-blur transition-all duration-200 placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 ${
     hasError
       ? "border-red-300 bg-red-50/60 focus:border-red-400 focus:ring-red-200"
       : "border-black/10 hover:border-[#6c5ce7]/40 focus:border-[#6c5ce7] focus:ring-[#6c5ce7]/20"
@@ -54,6 +55,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeTimerRef = useRef<number | null>(null);
+  const keyboardInset = useKeyboardInset(isOpen);
 
   // Reset everything whenever the modal closes so reopening is always fresh
   // (and any pending auto-close timer is cancelled).
@@ -88,12 +90,12 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside as any);
+      document.addEventListener("mousedown", handleClickOutside);
       document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as any);
+      document.removeEventListener("mousedown", handleClickOutside);
       document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
@@ -199,32 +201,44 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
             className="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm"
           />
 
-          {/* Modal */}
+          {/* Modal — bottom sheet on mobile, centered dialog on desktop */}
           <div
-            className="fixed inset-0 z-101 flex items-center justify-center overflow-y-auto p-3 sm:p-4"
+            style={keyboardInset > 0 ? { paddingBottom: keyboardInset } : undefined}
+            className="fixed inset-0 z-101 flex items-end justify-center overflow-hidden sm:items-center sm:p-4"
             role="dialog"
             aria-modal="true"
             aria-label="Contact Krennt Craven"
           >
             <motion.div
               ref={modalRef}
-              initial={{ opacity: 0, scale: 0.97, y: 12 }}
+              initial={{ opacity: 0, scale: 0.98, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97, y: 12 }}
-              transition={{ type: "spring", damping: 26, stiffness: 320 }}
-              className="relative my-auto w-full max-w-lg overflow-hidden rounded-2xl border border-black/10 bg-white p-6 shadow-2xl shadow-black/20 sm:p-8"
+              exit={{ opacity: 0, scale: 0.98, y: 24 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              style={
+                keyboardInset > 0
+                  ? { maxHeight: `calc(100dvh - ${keyboardInset}px - 0.5rem)` }
+                  : undefined
+              }
+              className="relative flex max-h-[92dvh] w-full max-w-none flex-col overflow-hidden rounded-t-2xl border border-black/10 bg-white shadow-2xl shadow-black/20 sm:my-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-lg sm:rounded-2xl"
             >
               {/* Thin accent line — the only decorative flourish */}
               <span
                 aria-hidden
-                className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]"
+                className="absolute inset-x-0 top-0 z-10 h-0.5 bg-linear-to-r from-[#6c5ce7] to-[#a29bfe]"
+              />
+
+              {/* Grab handle — mobile bottom-sheet affordance */}
+              <span
+                aria-hidden
+                className="mx-auto mt-2.5 h-1 w-10 shrink-0 rounded-full bg-neutral-300 sm:hidden"
               />
 
               {/* Close */}
               <button
                 onClick={onClose}
                 aria-label="Close contact form"
-                className={`absolute right-3 top-3 rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700 ${FOCUS_RING}`}
+                className={`absolute right-3 top-3 z-10 rounded-lg bg-white/70 p-2 text-neutral-400 backdrop-blur transition-colors hover:bg-neutral-100 hover:text-neutral-700 ${FOCUS_RING}`}
               >
                 <svg
                   className="h-5 w-5"
@@ -242,6 +256,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                 </svg>
               </button>
 
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] pt-4 sm:px-8 sm:pb-8 sm:pt-7">
               <AnimatePresence mode="wait">
                 {isSubmitted ? (
                   /* ---------- Success ---------- */
@@ -302,7 +317,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     animate="show"
                   >
                     {/* Header — who you're actually reaching */}
-                    <motion.div variants={fieldItem} className="mb-6 pr-8">
+                    <motion.div variants={fieldItem} className="mb-5 pr-10 sm:mb-6">
                       <div className="flex items-center gap-3">
                         <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-black/10">
                           <Image
@@ -530,6 +545,7 @@ export default function ContactModal({ isOpen, onClose }: ContactModalProps) {
                   </motion.div>
                 )}
               </AnimatePresence>
+              </div>
             </motion.div>
           </div>
         </>

@@ -216,7 +216,7 @@ export default function LandingPageClient() {
                   whileTap={{ scale: 0.98 }}
                   className={`group inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 sm:text-base ${FOCUS_RING}`}
                 >
-                  View Projects
+                  View Featured
                   <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
                 </motion.button>
 

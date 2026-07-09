@@ -399,7 +399,7 @@ export default function About() {
           transition={{ duration: 0.25 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
-          className={`fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white text-neutral-700 shadow-lg backdrop-blur transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] md:hidden ${FOCUS_RING}`}
+          className={`fixed bottom-24 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white text-neutral-700 shadow-lg backdrop-blur transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] md:hidden ${FOCUS_RING}`}
           style={{ pointerEvents: showScrollTop ? "auto" : "none" }}
         >
           <ArrowUpIcon className="h-5 w-5" />

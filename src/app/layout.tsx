@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
+import CravunLauncher from "./frontend/chatbot/cravun-launcher";
 import { ContactModalProvider } from "./frontend/contact-modal/contact-modal-context";
 import FooterLazy from "./frontend/footer/footer-lazy";
 import NavigationBar from "./frontend/navigation-bar/navbar";
@@ -61,6 +62,7 @@ export default function RootLayout({
             <NavigationBar />
             <main className="flex-1">{children}</main>
             <FooterLazy />
+            <CravunLauncher />
           </ContactModalProvider>
         </PageTransitionProvider>
       </body>

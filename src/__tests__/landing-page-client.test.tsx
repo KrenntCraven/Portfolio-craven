@@ -127,10 +127,10 @@ describe("LandingPageClient", () => {
   });
 
   describe("Primary CTAs", () => {
-    it("renders the 'View Projects' button", () => {
+    it("renders the 'View Featured' button", () => {
       renderHero();
       expect(
-        screen.getByRole("button", { name: /View Projects/i })
+        screen.getByRole("button", { name: /View Featured/i })
       ).toBeInTheDocument();
     });
 

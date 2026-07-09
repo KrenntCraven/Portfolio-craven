@@ -164,9 +164,10 @@ Create a `.env.local` file in the root directory:
 CONTENTFUL_SPACE_ID=your_contentful_space_id
 CONTENTFUL_ACCESS_TOKEN=your_contentful_access_token
 RESEND_API_KEY=your_resend_api_key
+GROQ_API_KEY=your_groq_api_key
 ```
 
-> Get your Contentful credentials from the [Contentful Dashboard](https://app.contentful.com/) and your Resend key from the [Resend Dashboard](https://resend.com/dashboard).
+> Get your Contentful credentials from the [Contentful Dashboard](https://app.contentful.com/), your Resend key from the [Resend Dashboard](https://resend.com/dashboard), and your Groq key (free tier) from the [Groq Console](https://console.groq.com/keys). `GROQ_API_KEY` powers the Cravun AI assistant.
 
 ### 5. Run Development Server
 
