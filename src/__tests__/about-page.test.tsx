@@ -85,15 +85,25 @@ describe("About page", () => {
     it("renders at least one desktop about paragraph on initial load", () => {
       render(<About />);
       // jsdom defaults to a ~1024 px width, so desktop paragraphs are rendered
-      const firstParagraph = aboutParagraphs[0];
-      expect(screen.getByText(firstParagraph)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /I first learned to break down real problems instead of just writing code that compiles/,
+        ),
+      ).toBeInTheDocument();
     });
 
-    it("renders all desktop about paragraphs", () => {
+    it("renders the key about paragraphs and emphasized phrases", () => {
       render(<About />);
-      for (const text of aboutParagraphs) {
-        expect(screen.getByText(text)).toBeInTheDocument();
-      }
+      expect(
+        screen.getByText(/internships at Willis Towers Watson and GCash/),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/Somewhere along the way/)).toBeInTheDocument();
+      // Emphasized (bold accent) phrases render as their own elements.
+      expect(screen.getByText("20,000+ agents")).toBeInTheDocument();
+      expect(screen.getByText("over a million customers")).toBeInTheDocument();
+      expect(
+        screen.getByText(/whatever the system actually needs/),
+      ).toBeInTheDocument();
     });
 
     it("has the correct number of about paragraphs", () => {

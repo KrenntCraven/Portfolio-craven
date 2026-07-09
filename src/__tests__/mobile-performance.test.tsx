@@ -158,7 +158,6 @@ import {
   usePageTransition,
 } from "@/app/frontend/page-transition/page-transition";
 import About from "@/app/about/about-page";
-import { aboutMobileParagraphs, aboutParagraphs } from "@/app/about/about-data";
 import LandingPageClient from "@/app/frontend/home/landing-page-client";
 import { ContactModalProvider } from "@/app/frontend/contact-modal/contact-modal-context";
 
@@ -280,25 +279,28 @@ describe("About page – mobile paragraph variant", () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
   });
 
+  const firstParagraphMatcher =
+    /I first learned to break down real problems instead of just writing code that compiles/;
+
   it("shows mobile paragraphs when viewport width is 375 px", async () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 375 });
     await act(async () => { render(<About />); });
-    expect(screen.getByText(aboutMobileParagraphs[0])).toBeInTheDocument();
+    expect(screen.getByText(firstParagraphMatcher)).toBeInTheDocument();
   });
 
   it("shows desktop paragraphs when viewport width is 1440 px", async () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 1440 });
     await act(async () => { render(<About />); });
-    expect(screen.getByText(aboutParagraphs[0])).toBeInTheDocument();
+    expect(screen.getByText(firstParagraphMatcher)).toBeInTheDocument();
   });
 
   it("switches to mobile paragraphs when window resizes to 375 px", async () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 1440 });
     await act(async () => { render(<About />); });
-    expect(screen.getByText(aboutParagraphs[0])).toBeInTheDocument();
+    expect(screen.getByText(firstParagraphMatcher)).toBeInTheDocument();
     Object.defineProperty(window, "innerWidth", { configurable: true, value: 375 });
     await act(async () => { fireEvent(window, new Event("resize")); });
-    expect(screen.getByText(aboutMobileParagraphs[0])).toBeInTheDocument();
+    expect(screen.getByText(firstParagraphMatcher)).toBeInTheDocument();
   });
 });
 

@@ -316,12 +316,23 @@ export default function About() {
             </motion.h1>
 
             <motion.div variants={fadeUpItem} className="space-y-4">
-              {aboutData.map((text, index) => (
+              {aboutData.map((segments, index) => (
                 <p
                   key={index}
                   className="text-base leading-relaxed text-neutral-600 sm:text-lg"
                 >
-                  {text}
+                  {segments.map((segment, segmentIndex) =>
+                    typeof segment === "string" ? (
+                      segment
+                    ) : (
+                      <span
+                        key={segmentIndex}
+                        className="font-semibold text-[#6c5ce7]"
+                      >
+                        {segment.bold}
+                      </span>
+                    ),
+                  )}
                 </p>
               ))}
             </motion.div>
