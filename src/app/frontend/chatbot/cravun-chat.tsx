@@ -2,6 +2,8 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { EASE, FOCUS_RING } from "../project-ui";
 import { useKeyboardInset } from "../hooks/use-keyboard-inset";
 
@@ -95,6 +97,74 @@ function TypingDots() {
         />
       ))}
     </span>
+  );
+}
+
+/** Renders Cravun's Markdown replies (bold, lists, links) inside a bubble. */
+function MarkdownMessage({ content }: { content: string }) {
+  return (
+    <div className="space-y-2">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ children }) => (
+            <p className="whitespace-pre-wrap">{children}</p>
+          ),
+          strong: ({ children }) => (
+            <strong className="font-semibold text-neutral-900">
+              {children}
+            </strong>
+          ),
+          em: ({ children }) => <em className="italic">{children}</em>,
+          ul: ({ children }) => (
+            <ul className="ml-4 list-disc space-y-1 marker:text-neutral-400">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="ml-4 list-decimal space-y-1 marker:text-neutral-400">
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => <li className="pl-0.5">{children}</li>,
+          a: ({ href, children }) => {
+            const external = !!href && /^https?:\/\//.test(href);
+            return (
+              <a
+                href={href}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noopener noreferrer" : undefined}
+                className="font-medium text-[#6c5ce7] underline underline-offset-2 hover:text-[#5a4bd4]"
+              >
+                {children}
+              </a>
+            );
+          },
+          h1: ({ children }) => (
+            <p className="font-bold text-neutral-900">{children}</p>
+          ),
+          h2: ({ children }) => (
+            <p className="font-bold text-neutral-900">{children}</p>
+          ),
+          h3: ({ children }) => (
+            <p className="font-semibold text-neutral-900">{children}</p>
+          ),
+          code: ({ children }) => (
+            <code className="rounded bg-neutral-200/70 px-1 py-0.5 font-mono text-[0.85em]">
+              {children}
+            </code>
+          ),
+          hr: () => <hr className="border-neutral-200" />,
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-2 border-neutral-300 pl-3 text-neutral-600">
+              {children}
+            </blockquote>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }
 
@@ -645,19 +715,25 @@ export default function CravunChat({ isOpen, onClose }: CravunChatProps) {
                               }`}
                             >
                               <div
-                                className={`px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap wrap-anywhere ${
+                                className={`px-3.5 py-2.5 text-sm leading-relaxed wrap-anywhere ${
                                   isUser
-                                    ? `rounded-2xl bg-linear-to-br from-[#6c5ce7] to-[#a29bfe] text-white ${
+                                    ? `whitespace-pre-wrap rounded-2xl bg-linear-to-br from-[#6c5ce7] to-[#a29bfe] text-white ${
                                         endsGroup ? "rounded-br-sm" : ""
                                       }`
                                     : m.isError
-                                      ? "rounded-2xl rounded-tl-sm border border-red-200 bg-red-50 text-red-600"
+                                      ? "whitespace-pre-wrap rounded-2xl rounded-tl-sm border border-red-200 bg-red-50 text-red-600"
                                       : `rounded-2xl bg-neutral-100 text-neutral-800 ${
                                           startsGroup ? "rounded-tl-sm" : ""
                                         }`
                                 }`}
                               >
-                                {streamingThis ? <TypingDots /> : m.content}
+                                {streamingThis ? (
+                                  <TypingDots />
+                                ) : isUser || m.isError ? (
+                                  m.content
+                                ) : (
+                                  <MarkdownMessage content={m.content} />
+                                )}
                               </div>
                               {!streamingThis && endsGroup && (
                                 <span className="mt-1 px-1 text-[10px] text-neutral-400">
