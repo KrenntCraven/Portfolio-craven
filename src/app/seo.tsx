@@ -55,7 +55,7 @@ export const personSchema = {
   alternateName: "Krennt Craven Portfolio",
   url: SITE_URL,
   image: AUTHOR_IMAGE,
-  jobTitle: "Software Engineer",
+  jobTitle: "Full-Stack & Cloud Engineer",
   description: SITE_DESCRIPTION,
   sameAs: AUTHOR_SAME_AS,
   knowsAbout: AUTHOR_KNOWS_ABOUT,

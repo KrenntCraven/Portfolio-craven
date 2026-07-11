@@ -17,14 +17,30 @@ const nextConfig: NextConfig = {
   // Compress responses at the framework level
   compress: true,
 
-  // Redirect the default Vercel deployment URL to the canonical custom domain
+  // Canonicalize the host to the apex domain (https://krenntcraven.com).
+  // NOTE: Vercel must have the apex domain set as primary (with www -> apex),
+  // otherwise the platform's apex -> www redirect will loop against the
+  // www -> apex rule below.
   redirects: async () => [
     {
+      // Default Vercel deployment URL -> canonical custom domain
       source: "/:path*",
       has: [
         {
           type: "host",
           value: "krennt-craven.vercel.app",
+        },
+      ],
+      destination: "https://krenntcraven.com/:path*",
+      permanent: true,
+    },
+    {
+      // www -> apex, so the served host matches the canonical/OG/JSON-LD URLs
+      source: "/:path*",
+      has: [
+        {
+          type: "host",
+          value: "www.krenntcraven.com",
         },
       ],
       destination: "https://krenntcraven.com/:path*",
