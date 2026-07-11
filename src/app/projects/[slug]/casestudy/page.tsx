@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getFeaturedProjects, getProjectBySlug } from "../../../backend/contentful_init";
-import { creativeWorkSchema, JsonLd } from "../../../seo";
+import {
+  breadcrumbSchema,
+  creativeWorkSchema,
+  JsonLd,
+  OG_LOCALE,
+  OG_SITE_NAME,
+} from "../../../seo";
 import CaseStudyPageClient from "./CaseStudyPageClient";
 
 export const revalidate = 3600;
@@ -33,8 +39,16 @@ export async function generateMetadata({
       title: `Case Study: ${project.title} | Krennt Craven`,
       description,
       url: `/projects/${slug}/casestudy`,
+      siteName: OG_SITE_NAME,
+      locale: OG_LOCALE,
       type: "article",
       ...(project.coverPageUrl && { images: [{ url: project.coverPageUrl }] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Case Study: ${project.title} | Krennt Craven`,
+      description,
+      ...(project.coverPageUrl && { images: [project.coverPageUrl] }),
     },
   };
 }
@@ -52,15 +66,23 @@ export default async function CaseStudyPage({
   return (
     <>
       <JsonLd
-        schema={creativeWorkSchema({
-          title: `Case Study: ${project.title}`,
-          description:
-            project.headline ??
-            `Case study for ${project.title} by Krennt Craven.`,
-          path: `/projects/${slug}/casestudy`,
-          image: project.coverPageUrl,
-          isCaseStudy: true,
-        })}
+        schema={[
+          creativeWorkSchema({
+            title: `Case Study: ${project.title}`,
+            description:
+              project.headline ??
+              `Case study for ${project.title} by Krennt Craven.`,
+            path: `/projects/${slug}/casestudy`,
+            image: project.coverPageUrl,
+            isCaseStudy: true,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/projects" },
+            { name: project.title, path: `/projects/${slug}` },
+            { name: "Case Study", path: `/projects/${slug}/casestudy` },
+          ]),
+        ]}
       />
       <CaseStudyPageClient project={project} />
     </>

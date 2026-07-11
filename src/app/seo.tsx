@@ -10,6 +10,11 @@ export const SITE_URL = "https://krenntcraven.com";
 export const AUTHOR_NAME = "Krennt Craven";
 export const AUTHOR_IMAGE = `${SITE_URL}/Picture.jpg`;
 
+/** Shared Open Graph identity so per-page OG blocks don't drop these when they
+ * override the root metadata (Next.js shallow-merges `openGraph`). */
+export const OG_SITE_NAME = "Krennt Craven";
+export const OG_LOCALE = "en_US";
+
 export const SITE_DESCRIPTION =
   "Krennt Craven is a full-stack and cloud engineer building scalable, cloud-native systems — from frontend to backend to AWS infrastructure. Explore his experience, featured projects, and case studies.";
 
@@ -54,6 +59,10 @@ export const personSchema = {
   description: SITE_DESCRIPTION,
   sameAs: AUTHOR_SAME_AS,
   knowsAbout: AUTHOR_KNOWS_ABOUT,
+  worksFor: {
+    "@type": "Organization",
+    name: "Amdocs",
+  },
   alumniOf: {
     "@type": "CollegeOrUniversity",
     name: "Pamantasan ng Lungsod ng Maynila",
@@ -107,6 +116,21 @@ export function creativeWorkSchema(input: {
     author: { "@id": PERSON_ID },
     creator: { "@id": PERSON_ID },
     isPartOf: { "@id": WEBSITE_ID },
+  } as const;
+}
+
+/** BreadcrumbList schema so Google can render breadcrumb rich results and
+ * better understand the site hierarchy on nested (project/case-study) pages. */
+export function breadcrumbSchema(items: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path}`,
+    })),
   } as const;
 }
 

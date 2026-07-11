@@ -246,7 +246,7 @@ export default function LandingPageClient() {
                       rel: "noopener noreferrer",
                     })}
                     {...("download" in social &&
-                      social.download && { download: true })}
+                      social.download && { download: social.download })}
                     className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white/55 text-neutral-600 shadow-sm backdrop-blur transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] ${FOCUS_RING}`}
                   >
                     <span className="h-5 w-5">{social.icon}</span>

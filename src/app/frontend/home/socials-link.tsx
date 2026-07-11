@@ -46,7 +46,7 @@ const socials = () => [
     label: "Resume",
     href: "/resume.pdf",
     external: true,
-    download: true,
+    download: "Resume - Krennt Craven Villalon.pdf",
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
         <path

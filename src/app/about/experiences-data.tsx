@@ -92,7 +92,7 @@ export const experiences: Experience[] = [
   {
     company: "Global Scaling Group",
     position: "Lead Generation Intern",
-    period: "May 2023 - June 2024",
+    period: "May 2023 - June 2023",
     description: [
       {
         title: "Lead Generation",
@@ -139,7 +139,7 @@ export const experiencesMobile: Experience[] = [
   {
     company: "Global Scaling Group",
     position: "Lead Generation Intern",
-    period: "May 2023 - June 2024",
+    period: "May 2023 - June 2023",
     description: [
       "Generated sales opportunities through prospect research, lead qualification, and client engagement.",
     ],
