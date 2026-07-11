@@ -1,8 +1,6 @@
 "use client";
 
 import { animate, motion } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -57,75 +55,93 @@ export default function Footer() {
   };
 
   useEffect(() => {
+    // On touch/reduced-motion devices the wave never runs, so GSAP is loaded
+    // dynamically below only when needed — keeping it out of the mobile bundle.
     if (skipAnimations) return;
 
-    gsap.registerPlugin(ScrollTrigger);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+    let cleanupScrollTriggers: (() => void) | undefined;
 
-    const down = "M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z";
-    const center = "M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z";
+    void (async () => {
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+      ]);
+      if (cancelled) return;
 
-    if (pathRef.current) {
-      pathRef.current.setAttribute("d", down);
-    }
+      gsap.registerPlugin(ScrollTrigger);
+      cleanupScrollTriggers = () =>
+        ScrollTrigger.getAll().forEach((t) => t.kill());
 
-    const timer = setTimeout(() => {
-      let waveTween: gsap.core.Tween | null = null;
-      let waveTicker: gsap.TickerCallback | null = null;
+      const down = "M0-0.3C0-0.3,464,156,1139,156S2278-0.3,2278-0.3V683H0V-0.3z";
+      const center = "M0-0.3C0-0.3,464,0,1139,0s1139-0.3,1139-0.3V683H0V-0.3z";
 
-      const playAnimation = () => {
-        if (!pathRef.current || !svgRef.current) return;
+      if (pathRef.current) {
+        pathRef.current.setAttribute("d", down);
+      }
 
-        gsap.set(pathRef.current, { attr: { d: down } });
+      timer = setTimeout(() => {
+        if (cancelled) return;
+        let waveTween: ReturnType<typeof gsap.to> | null = null;
+        let waveTicker: ((time: number) => void) | null = null;
 
-        if (waveTween) waveTween.kill();
-        if (waveTicker) gsap.ticker.remove(waveTicker);
+        const playAnimation = () => {
+          if (!pathRef.current || !svgRef.current) return;
 
-        const wave = { amp: 1 };
-        const maxAmp = 48;
-        const freq = 6;
+          gsap.set(pathRef.current, { attr: { d: down } });
 
-        waveTicker = (time) => {
-          if (!pathRef.current) return;
+          if (waveTween) waveTween.kill();
+          if (waveTicker) gsap.ticker.remove(waveTicker);
 
-          const a = wave.amp * maxAmp;
-          const t = time * freq;
+          const wave = { amp: 1 };
+          const maxAmp = 48;
+          const freq = 6;
 
-          const y1 = Math.sin(t) * a;
-          const y2 = Math.sin(t + Math.PI / 2) * a * 0.85;
-          const y3 = Math.sin(t + Math.PI) * a;
+          waveTicker = (time) => {
+            if (!pathRef.current) return;
 
-          pathRef.current.setAttribute(
-            "d",
-            `M0-0.3C0-0.3,464,${y1},1139,${y2}S2278,${y3},2278-0.3V683H0V-0.3z`,
-          );
+            const a = wave.amp * maxAmp;
+            const t = time * freq;
+
+            const y1 = Math.sin(t) * a;
+            const y2 = Math.sin(t + Math.PI / 2) * a * 0.85;
+            const y3 = Math.sin(t + Math.PI) * a;
+
+            pathRef.current.setAttribute(
+              "d",
+              `M0-0.3C0-0.3,464,${y1},1139,${y2}S2278,${y3},2278-0.3V683H0V-0.3z`,
+            );
+          };
+
+          gsap.ticker.add(waveTicker);
+
+          waveTween = gsap.to(wave, {
+            amp: 0,
+            duration: 1.4,
+            ease: "expo.out",
+            onComplete: () => {
+              if (waveTicker) gsap.ticker.remove(waveTicker);
+              pathRef.current?.setAttribute("d", center);
+            },
+          });
         };
 
-        gsap.ticker.add(waveTicker);
-
-        waveTween = gsap.to(wave, {
-          amp: 0,
-          duration: 1.4,
-          ease: "expo.out",
-          onComplete: () => {
-            if (waveTicker) gsap.ticker.remove(waveTicker);
-            pathRef.current?.setAttribute("d", center);
-          },
+        ScrollTrigger.create({
+          trigger: footerRef.current,
+          start: "top bottom",
+          onEnter: playAnimation,
+          onEnterBack: playAnimation,
         });
-      };
 
-      ScrollTrigger.create({
-        trigger: footerRef.current,
-        start: "top bottom",
-        onEnter: playAnimation,
-        onEnterBack: playAnimation,
-      });
-
-      ScrollTrigger.refresh();
-    }, 500);
+        ScrollTrigger.refresh();
+      }, 500);
+    })();
 
     return () => {
-      clearTimeout(timer);
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      cleanupScrollTriggers?.();
     };
   }, []);
 
