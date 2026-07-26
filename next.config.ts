@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
         hostname: "images.ctfassets.net",
       },
     ],
-    formats: ["image/avif", "image/webp"],
+    // Prefer WebP over AVIF: AVIF encode is CPU-heavy (especially cold hits in
+    // `next dev`) and made local already-optimised WebP covers feel slow.
+    formats: ["image/webp"],
     qualities: [70, 75, 85],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

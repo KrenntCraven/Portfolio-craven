@@ -44,6 +44,31 @@ function isAsset(asset: any): asset is Asset {
   return asset && "fields" in asset;
 }
 
+// Contentful list fields can arrive as an array, a single value, or (for
+// short-text lists) a comma-separated string. Normalize to a clean string[].
+// `toTags` splits on commas (tech/type chips); `toList` preserves commas
+// inside each item (feature sentences).
+function toTags(value: unknown): string[] {
+  const arr = Array.isArray(value)
+    ? value
+    : value !== undefined && value !== null && value !== ""
+      ? [value]
+      : [];
+  return arr
+    .flatMap((v) => String(v).split(","))
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function toList(value: unknown): string[] {
+  const arr = Array.isArray(value)
+    ? value
+    : value !== undefined && value !== null && value !== ""
+      ? [value]
+      : [];
+  return arr.map((v) => String(v).trim()).filter(Boolean);
+}
+
 async function _getFeaturedProjects(): Promise<Project[]> {
   const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
@@ -68,9 +93,9 @@ async function _getFeaturedProjects(): Promise<Project[]> {
         item.fields.coverPage.fields?.file?.url
           ? `https:${item.fields.coverPage.fields.file.url}`
           : undefined,
-      projectType: item.fields.projectType,
-      technologies: item.fields.technologies,
-      keyFeatures: item.fields.keyFeatures || [],
+      projectType: toTags(item.fields.projectType),
+      technologies: toTags(item.fields.technologies),
+      keyFeatures: toList(item.fields.keyFeatures),
       role: item.fields.role,
       caseStudy: item.fields.caseStudy,
       problemCaseStudy: item.fields.problemCaseStudy,
@@ -119,8 +144,8 @@ async function _getProjectBySlug(slug: string): Promise<Project | null> {
       item.fields.coverPage.fields?.file?.url
         ? `https:${item.fields.coverPage.fields.file.url}`
         : undefined,
-    projectType: item.fields.projectType,
-    keyFeatures: item.fields.keyFeatures || [],
+    projectType: toTags(item.fields.projectType),
+    keyFeatures: toList(item.fields.keyFeatures),
     role: item.fields.role,
     caseStudy: item.fields.caseStudy,
     problemCaseStudy: item.fields.problemCaseStudy,
@@ -130,7 +155,7 @@ async function _getProjectBySlug(slug: string): Promise<Project | null> {
     challengesLearningsCaseStudy: item.fields.challengesLearningsCaseStudy,
     impactStats: item.fields.impactStats as ImpactStat[] | undefined,
     siteLink: item.fields.siteLink,
-    technologies: item.fields.technologies,
+    technologies: toTags(item.fields.technologies),
     githubLink: item.fields.githubLink,
     order: item.fields.order,
   };

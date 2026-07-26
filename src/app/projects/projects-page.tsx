@@ -2,51 +2,119 @@
 
 import { MotionConfig, motion } from "framer-motion";
 import Link from "next/link";
+import { BannerBackground } from "../frontend/banner-background";
+import ProjectCard from "../frontend/project-card";
 import {
   Eyebrow,
   FOCUS_RING,
   fadeUpItem,
   heroStagger,
 } from "../frontend/project-ui";
+import { localProjects } from "./projects-data";
+
+// Stagger container for the card grid — children (ProjectCard) inherit the
+// enter animation via their own `variants`, keeping motion consistent with the
+// rest of the site while entering only once, on scroll into view.
+const gridStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
 
 export default function ProjectsPageClient() {
+  const hasProjects = localProjects.length > 0;
+
   return (
     <MotionConfig reducedMotion="user">
-      <div className="relative min-h-[70vh] bg-white pt-24 pb-20 text-neutral-900 sm:pt-28">
-        <motion.div
-          variants={heroStagger}
-          initial="hidden"
-          animate="show"
-          className="mx-auto max-w-2xl px-4 text-center sm:px-6"
-        >
-          <motion.div variants={fadeUpItem}>
-            <Eyebrow className="justify-center">Projects</Eyebrow>
-          </motion.div>
+      <div className="relative min-h-screen overflow-visible bg-white pb-24 text-neutral-900">
+        <BannerBackground />
 
-          <motion.h1
-            variants={fadeUpItem}
-            className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl"
+        {/* Section background treatment — matches the home Featured surface */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-linear-to-b from-neutral-50/80 via-white/0 to-neutral-50/60" />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgba(108,92,231,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(108,92,231,0.05) 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+              maskImage:
+                "radial-gradient(ellipse 80% 55% at 50% 18%, #000 30%, transparent 80%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 80% 55% at 50% 18%, #000 30%, transparent 80%)",
+            }}
+          />
+          <div className="absolute -top-8 left-1/2 h-72 w-176 max-w-[90vw] -translate-x-1/2 rounded-full bg-[#6c5ce7]/6 blur-3xl" />
+        </div>
+
+        <section className="relative z-10 mx-auto max-w-7xl px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8 lg:pb-28 lg:pt-36">
+          <motion.div
+            variants={heroStagger}
+            initial="hidden"
+            animate="show"
+            className="mx-auto max-w-3xl text-center"
           >
-            Coming soon
-          </motion.h1>
+            <motion.div variants={fadeUpItem}>
+              <Eyebrow className="justify-center">Projects</Eyebrow>
+            </motion.div>
 
-          <motion.p
-            variants={fadeUpItem}
-            className="mt-4 text-base leading-relaxed text-neutral-600"
-          >
-            This page is being built. For now, explore featured work on the home
-            page.
-          </motion.p>
-
-          <motion.div variants={fadeUpItem} className="mt-8">
-            <Link
-              href="/#projects"
-              className={`inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 ${FOCUS_RING}`}
+            <motion.h1
+              variants={fadeUpItem}
+              className="mt-6 text-4xl font-semibold tracking-tight text-neutral-800 sm:text-5xl"
             >
-              View featured work
-            </Link>
+              Things I&apos;ve been building
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUpItem}
+              className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-neutral-600 sm:text-lg"
+            >
+              A growing collection of projects — from production systems to
+              experiments — focused on real-world problems and scalable
+              solutions.
+            </motion.p>
           </motion.div>
-        </motion.div>
+
+          {hasProjects ? (
+            <motion.ul
+              variants={gridStagger}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.15 }}
+              className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3 lg:gap-10"
+            >
+              {localProjects.map((project, index) => (
+                <li key={project.id} className="flex">
+                  <ProjectCard
+                    id={project.id}
+                    title={project.title}
+                    description={project.description}
+                    technologies={project.technologies}
+                    image={project.coverImage}
+                    category={project.category}
+                    status={project.status}
+                    featured={project.featured}
+                    href={`/projects/${project.slug}`}
+                    className="w-full"
+                    priority={index === 0}
+                  />
+                </li>
+              ))}
+            </motion.ul>
+          ) : (
+            <div className="mt-16 text-center">
+              <p className="text-base text-neutral-600">
+                New projects are on the way. In the meantime, explore featured
+                work on the home page.
+              </p>
+              <Link
+                href="/#projects"
+                className={`mt-6 inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 ${FOCUS_RING}`}
+              >
+                View featured work
+              </Link>
+            </div>
+          )}
+        </section>
       </div>
     </MotionConfig>
   );
