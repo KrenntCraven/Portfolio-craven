@@ -2,39 +2,24 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { BannerBackground } from "../banner-background";
 import { usePageTransition } from "../page-transition/page-transition";
-import { ArrowRightIcon } from "../project-ui";
+import { ArrowRightIcon, FOCUS_RING } from "../project-ui";
 
-// Define the Project type
+/**
+ * Cards are rendered from the shared project catalog, which already resolved
+ * each project's category, stack chips and cover image — so this grid stays
+ * purely presentational and cannot drift from /projects.
+ */
 type Project = {
   id: string;
   title: string;
-  imageUrl?: string;
   slug: string;
-  coverPageUrl?: string;
-  projectType?: string | string[];
-  technologies?: string | string[];
-};
-
-// Normalize a Contentful field that may be a single value, an array, or a
-// comma-separated string ("React Native, Firebase,") into clean tags.
-const toTags = (value?: string | string[]): string[] => {
-  const arr = Array.isArray(value) ? value : value ? [value] : [];
-  return arr
-    .flatMap((v) => v.split(","))
-    .map((v) => v.trim())
-    .filter(Boolean);
-};
-
-// Curated per-project tag lists (overrides the raw Contentful fields so the
-// featured cards show a consistent, hand-picked stack). Keyed by slug.
-const TAG_OVERRIDES: Record<string, string[]> = {
-  onesync: ["Full-Stack", "Flutter", "Node.js", "Firebase", "RFID/Hardware"],
-  sagip: ["Full-Stack", "React Native", "Firebase", "Google Maps API"],
-  "ang-pamantasan": ["Full-Stack", "Next.js", "Contentful", "GraphQL"],
-  "g-connect": ["Full-Stack", "Next.js", "API Design", "Vercel"],
+  image?: string;
+  category?: string;
+  technologies?: string[];
 };
 
 const fadeUp = {
@@ -130,15 +115,10 @@ export default function FeaturedProjectsClient({
             className="relative grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10"
           >
           {projects.map((project) => {
-            const override = TAG_OVERRIDES[project.slug];
             // Category (metadata, e.g. "Full-Stack") is emphasised separately
             // from the technology stack for a clearer information hierarchy.
-            const category = override
-              ? override.slice(0, 1)
-              : toTags(project.projectType);
-            const stack = override
-              ? override.slice(1)
-              : toTags(project.technologies);
+            const category = project.category;
+            const stack = project.technologies ?? [];
             const MAX_STACK = 3;
             const visibleStack = stack.slice(0, MAX_STACK);
             const hiddenStack = stack.length - visibleStack.length;
@@ -154,16 +134,16 @@ export default function FeaturedProjectsClient({
               >
                 {/* Project Image */}
                 <div className="relative aspect-4/3 w-full overflow-hidden bg-linear-to-br from-neutral-100 via-neutral-50 to-white">
-                  {category[0] && (
+                  {category && (
                     <span className="absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#6c5ce7] shadow-sm backdrop-blur">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#6c5ce7]" />
-                      {category[0]}
+                      {category}
                     </span>
                   )}
-                  {project.coverPageUrl ? (
+                  {project.image ? (
                     <>
                       <Image
-                        src={`${project.coverPageUrl}?fm=webp&fit=fill`}
+                        src={project.image}
                         alt={project.title}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -217,6 +197,22 @@ export default function FeaturedProjectsClient({
           })}
           </motion.div>
         </motion.div>
+
+        {/* The Spotlight is a curated slice of the catalog, so point visitors at
+            the full list — three cards shouldn't imply three projects. */}
+        <div className="mt-14 flex justify-center lg:mt-16">
+          <Link
+            href="/projects"
+            onClick={(e) => {
+              e.preventDefault();
+              startTransition("/projects");
+            }}
+            className={`group inline-flex items-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 ${FOCUS_RING}`}
+          >
+            View all projects
+            <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </div>
       </section>
     </div>
   );

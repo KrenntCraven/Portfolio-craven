@@ -1,10 +1,13 @@
-import FeaturedProjectsClient from "../frontend/home/featured-projects";
-import { getFeaturedProjects } from "./contentful_init";
+import FeaturedProjectsClient from "../frontend/home/featured-spotlight";
+import { getSpotlightProjects } from "../projects/projects-catalog";
 
 export const revalidate = 3600;
 
-// server Wrapper to fetch data and pass to client component
+// Server wrapper: fetches the curated Spotlight slice of the projects catalog
+// (see projects-catalog.ts) and passes it to the client grid. Reading from the
+// catalog rather than Contentful directly keeps the homepage a strict subset of
+// /projects.
 export default async function FeaturedProjectsWrapper() {
-  const projects = await getFeaturedProjects();
+  const projects = await getSpotlightProjects();
   return <FeaturedProjectsClient projects={projects} />;
 }

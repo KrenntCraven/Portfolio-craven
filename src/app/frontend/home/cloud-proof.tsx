@@ -59,7 +59,7 @@ export default function CloudProof() {
           </div>
         </Reveal>
 
-        {/* Matches the featured-projects grid. At the 2-column breakpoint the
+        {/* Matches the featured-spotlight grid. At the 2-column breakpoint the
             trailing card spans both so it doesn't sit alone as a half-width orphan. */}
         <ul className="mt-12 grid grid-cols-1 gap-6 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {cloudHighlights.map((item, i) => (

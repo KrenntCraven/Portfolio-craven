@@ -35,7 +35,10 @@ function CertCard({ cert }: { cert: Cert }) {
         className="absolute inset-0 bg-[#6c5ce7]/0 transition-colors duration-300 group-hover:bg-[#6c5ce7]/4"
       />
 
-      <div className="relative flex items-start gap-4 sm:gap-5">
+      {/* `items-stretch` (not `items-start`) lets the text column fill the card
+          so its `mt-auto` footer can sit on the bottom edge. The badge keeps its
+          own fixed size. */}
+      <div className="relative flex flex-1 items-stretch gap-4 sm:gap-5">
         <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50/80 p-2 sm:h-24 sm:w-24">
           <div className="relative h-full w-full">
             <Image
@@ -49,7 +52,7 @@ function CertCard({ cert }: { cert: Cert }) {
           </div>
         </div>
 
-        <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-neutral-200 bg-white px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-neutral-600">
               {cert.issuer}
@@ -63,26 +66,38 @@ function CertCard({ cert }: { cert: Cert }) {
             {cert.title}
           </h3>
 
-          {cert.link ? (
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6c5ce7]">
-              View credential
-              <ExternalIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500">
-              <VerifiedIcon className="h-3.5 w-3.5 text-[#6c5ce7]" />
-              Verified
-            </span>
-          )}
+          {/* Pinned to the bottom so the footer lines up across every card,
+              whatever the title wraps to. */}
+          <div className="mt-auto">
+            {cert.link ? (
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6c5ce7]">
+                View credential
+                <ExternalIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </span>
+            ) : (
+              // Held, but with no credential URL to link out to.
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500">
+                <VerifiedIcon className="h-3.5 w-3.5 shrink-0 text-[#6c5ce7]" />
+                Verified
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </>
   );
 
-  const cardClass = `group relative block overflow-hidden ${ABOUT_CARD} p-5 sm:p-6 hover:border-[#6c5ce7]/30 hover:shadow-[0_28px_70px_-32px_rgba(108,92,231,0.35)]`;
+  // `h-full` + flex column: grid rows stretch the wrapper, and the card fills
+  // it, so cards in a row share one height instead of each sizing to its text.
+  const cardClass = `group relative flex h-full flex-col overflow-hidden ${ABOUT_CARD} p-5 sm:p-6 hover:border-[#6c5ce7]/30 hover:shadow-[0_28px_70px_-32px_rgba(108,92,231,0.35)]`;
 
   return (
-    <motion.div variants={fadeUpItem} whileHover={{ y: -4 }} transition={{ duration: 0.25 }}>
+    <motion.div
+      variants={fadeUpItem}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="h-full"
+    >
       {cert.link ? (
         <a
           href={cert.link}
@@ -100,7 +115,9 @@ function CertCard({ cert }: { cert: Cert }) {
 }
 
 export default function Certification() {
-  const verifiedCount = certifications.length;
+  // Only a credential with a public URL can actually be checked by a reader —
+  // counting all of them here overstated the claim by one.
+  const verifiedCount = certifications.filter((cert) => cert.link).length;
 
   return (
     <div className="relative overflow-hidden bg-white">

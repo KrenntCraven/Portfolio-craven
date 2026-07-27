@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { breadcrumbSchema, JsonLd, OG_LOCALE, OG_SITE_NAME } from "../seo";
+import { getAllProjects } from "./projects-catalog";
 import ProjectsPageClient from "./projects-page";
+
+export const revalidate = 3600;
 
 // Distinct copy per surface, all highlighting the actual stack and the kind of
 // engineering work the projects demonstrate — no homepage copy reused.
@@ -32,7 +35,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = await getAllProjects();
+
   return (
     <>
       <JsonLd
@@ -41,7 +46,7 @@ export default function ProjectsPage() {
           { name: "Projects", path: "/projects" },
         ])}
       />
-      <ProjectsPageClient />
+      <ProjectsPageClient projects={projects} />
     </>
   );
 }

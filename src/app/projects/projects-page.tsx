@@ -10,7 +10,7 @@ import {
   fadeUpItem,
   heroStagger,
 } from "../frontend/project-ui";
-import { localProjects } from "./projects-data";
+import type { ProjectSummary } from "./projects-catalog";
 
 // Stagger container for the card grid — children (ProjectCard) inherit the
 // enter animation via their own `variants`, keeping motion consistent with the
@@ -20,8 +20,12 @@ const gridStagger = {
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 
-export default function ProjectsPageClient() {
-  const hasProjects = localProjects.length > 0;
+export default function ProjectsPageClient({
+  projects,
+}: {
+  projects: ProjectSummary[];
+}) {
+  const hasProjects = projects.length > 0;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -82,18 +86,12 @@ export default function ProjectsPageClient() {
               viewport={{ once: true, amount: 0.15 }}
               className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3 lg:gap-10"
             >
-              {localProjects.map((project, index) => (
-                <li key={project.id} className="flex">
+              {/* `ProjectSummary` is shaped for this card, so it maps straight
+                  through — the catalog decides content and order, not the view. */}
+              {projects.map(({ slug, ...card }, index) => (
+                <li key={slug} className="flex">
                   <ProjectCard
-                    id={project.id}
-                    title={project.title}
-                    description={project.description}
-                    technologies={project.technologies}
-                    image={project.coverImage}
-                    category={project.category}
-                    status={project.status}
-                    featured={project.featured}
-                    href={`/projects/${project.slug}`}
+                    {...card}
                     className="w-full"
                     priority={index === 0}
                   />

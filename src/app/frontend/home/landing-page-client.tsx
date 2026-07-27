@@ -106,7 +106,12 @@ function getSnapAnchors() {
   return anchors;
 }
 
-export default function LandingPageClient() {
+export default function LandingPageClient({
+  credentials = [],
+}: {
+  /** Proof chips rendered under the tagline; built by `getHeroCredentials`. */
+  credentials?: string[];
+}) {
   const isSnappingRef = useRef(false);
   const cooldownUntilRef = useRef(0);
   const { open: openContact } = useContactModal();
@@ -276,7 +281,33 @@ export default function LandingPageClient() {
               </p>
             </motion.div>
 
-            {/* Actions — CTAs grouped above social icons */}
+            {/* Credentials — concrete proof for the "cloud engineer" claim above,
+                so it isn't left resting on the tagline alone. */}
+            {credentials.length > 0 && (
+              <motion.ul
+                variants={item}
+                aria-label="Credentials"
+                className="flex flex-wrap items-center gap-2.5"
+              >
+                {credentials.map((credential) => (
+                  <li
+                    key={credential}
+                    className="inline-flex items-center gap-2 rounded-full border border-neutral-200/80 bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-neutral-700 shadow-sm backdrop-blur sm:text-sm"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#6c5ce7]"
+                      aria-hidden
+                    />
+                    {credential}
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+
+            {/* Actions — CTAs grouped above social icons.
+                Viewing the work is the primary action: it carries the filled
+                treatment and a larger footprint, while "Get in touch" is kept
+                deliberately quiet so the two don't read as equal choices. */}
             <motion.div variants={item} className="flex flex-col gap-5">
               <div className="flex flex-wrap items-center gap-3">
                 <motion.button
@@ -284,7 +315,7 @@ export default function LandingPageClient() {
                   onClick={scrollToProjects}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`group inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 sm:text-base ${FOCUS_RING}`}
+                  className={`group inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 sm:text-base ${FOCUS_RING}`}
                 >
                   View Spotlight
                   <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
@@ -295,7 +326,9 @@ export default function LandingPageClient() {
                   onClick={openContact}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white/60 px-6 py-3 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] sm:text-base ${FOCUS_RING}`}
+                  // `min-h-11` keeps the 44px touch target the lighter padding
+                  // would otherwise fall below on phones.
+                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-transparent px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-[#6c5ce7]/40 hover:bg-[#6c5ce7]/5 hover:text-[#6c5ce7] sm:text-base ${FOCUS_RING}`}
                 >
                   Get in touch
                 </motion.button>

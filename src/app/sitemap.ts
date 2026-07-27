@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getFeaturedProjects } from "./backend/contentful_init";
+import { localProjects } from "./projects/projects-data";
 import { SITE_URL } from "./seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -25,6 +26,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
   ];
+
+  // Locally registered projects have no case-study route.
+  const localProjectRoutes: MetadataRoute.Sitemap = localProjects.map(
+    (project) => ({
+      url: `${SITE_URL}/projects/${project.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    }),
+  );
 
   let projectRoutes: MetadataRoute.Sitemap = [];
 
@@ -54,5 +65,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Failed to load projects for sitemap:", error);
   }
 
-  return [...staticRoutes, ...projectRoutes];
+  return [...staticRoutes, ...localProjectRoutes, ...projectRoutes];
 }

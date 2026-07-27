@@ -7,7 +7,7 @@
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import FeaturedProjectsClient from "@/app/frontend/home/featured-projects";
+import FeaturedProjectsClient from "@/app/frontend/home/featured-spotlight";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -66,17 +66,18 @@ const makeProject = (overrides: Partial<Project> = {}): Project => ({
   id: "project-1",
   title: "sample project",
   slug: "sample-project",
-  imageUrl: undefined,
-  coverPageUrl: undefined,
+  image: undefined,
   ...overrides,
 });
 
+// Mirrors the catalog-derived summary the grid receives.
 type Project = {
   id: string;
   title: string;
-  imageUrl?: string;
   slug: string;
-  coverPageUrl?: string;
+  image?: string;
+  category?: string;
+  technologies?: string[];
 };
 
 // ---------------------------------------------------------------------------
@@ -151,11 +152,11 @@ describe("FeaturedProjectsClient", () => {
   });
 
   describe("Fallback initial letter", () => {
-    it("shows the first letter of the title when coverPageUrl is absent", () => {
+    it("shows the first letter of the title when the cover image is absent", () => {
       render(
         <FeaturedProjectsClient
           projects={[
-            makeProject({ title: "zeta project", slug: "zeta", coverPageUrl: undefined }),
+            makeProject({ title: "zeta project", slug: "zeta", image: undefined }),
           ]}
         />
       );
@@ -166,7 +167,7 @@ describe("FeaturedProjectsClient", () => {
     it("shows 'P' as fallback when the title is an empty string", () => {
       render(
         <FeaturedProjectsClient
-          projects={[makeProject({ title: "", slug: "empty", coverPageUrl: undefined })]}
+          projects={[makeProject({ title: "", slug: "empty", image: undefined })]}
         />
       );
       expect(screen.getByText("P")).toBeInTheDocument();
@@ -174,14 +175,36 @@ describe("FeaturedProjectsClient", () => {
   });
 
   describe("Project image", () => {
-    it("renders an img with the project title as alt text when coverPageUrl is provided", () => {
-      const cover = "https://images.ctfassets.net/cover.jpg";
+    it("renders an img with the project title as alt text when a cover image is provided", () => {
+      const cover = "https://images.ctfassets.net/cover.jpg?fm=webp&fit=fill";
       render(
         <FeaturedProjectsClient
-          projects={[makeProject({ title: "design system", coverPageUrl: cover })]}
+          projects={[makeProject({ title: "design system", image: cover })]}
         />
       );
       expect(screen.getByAltText("design system")).toBeInTheDocument();
+    });
+  });
+
+  describe("Catalog-provided card metadata", () => {
+    it("renders the category badge and stack chips resolved by the catalog", () => {
+      render(
+        <FeaturedProjectsClient
+          projects={[
+            makeProject({
+              title: "onesync",
+              slug: "onesync",
+              category: "Full-Stack",
+              technologies: ["Flutter", "Node.js", "Firebase", "RFID/Hardware"],
+            }),
+          ]}
+        />
+      );
+      expect(screen.getByText("Full-Stack")).toBeInTheDocument();
+      expect(screen.getByText("Flutter")).toBeInTheDocument();
+      // Only three chips are shown; the remainder collapses into "+N more".
+      expect(screen.queryByText("RFID/Hardware")).not.toBeInTheDocument();
+      expect(screen.getByText("+1 more")).toBeInTheDocument();
     });
   });
 
