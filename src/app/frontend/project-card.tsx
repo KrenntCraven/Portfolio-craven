@@ -174,7 +174,7 @@ export default function ProjectCard({
 
       {/* Media */}
       <div className="relative aspect-4/3 w-full overflow-hidden bg-linear-to-br from-neutral-100 via-neutral-50 to-white">
-        {/* Top-left badges: featured (optional) + category */}
+        {/* Top-left badges: spotlight (optional) + category */}
         <div className="pointer-events-none absolute left-4 top-4 z-30 flex flex-col items-start gap-2">
           {featured && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-linear-to-r from-[#6c5ce7] to-[#a29bfe] px-3 py-1 text-xs font-semibold text-white shadow-sm">
@@ -186,7 +186,7 @@ export default function ProjectCard({
               >
                 <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.77l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
               </svg>
-              Featured
+              Spotlight
             </span>
           )}
           {category && (

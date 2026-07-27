@@ -85,10 +85,10 @@ type Project = {
 
 describe("FeaturedProjectsClient", () => {
   describe("Section heading & subtitle", () => {
-    it("renders the 'Featured Projects' h1", () => {
+    it("renders the 'Spotlight' h1", () => {
       render(<FeaturedProjectsClient projects={[]} />);
       expect(
-        screen.getByRole("heading", { level: 1, name: /Featured Projects/i })
+        screen.getByRole("heading", { level: 1, name: /^Spotlight$/i })
       ).toBeInTheDocument();
     });
 

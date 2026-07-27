@@ -53,7 +53,7 @@ export async function generateMetadata({
   const project = await resolveProject(slug);
   if (!project) return {};
   const description =
-    project.headline ?? `${project.title} — a featured project by Krennt Craven.`;
+    project.headline ?? `${project.title} — a project by Krennt Craven.`;
   // Plain string title lets the root "%s | Krennt Craven" template apply once.
   return {
     title: project.title,
@@ -99,7 +99,7 @@ export default async function ProjectPage({
           title: project.title,
           description:
             project.headline ??
-            `${project.title} — a featured project by Krennt Craven.`,
+            `${project.title} — a project by Krennt Craven.`,
           path: `/projects/${slug}`,
           image: project.coverPageUrl,
         }),
@@ -112,7 +112,7 @@ export default async function ProjectPage({
     />
   );
 
-  // Contentful "Featured Projects" keep their original detail design. Only
+  // Contentful "Spotlight" projects keep their original detail design. Only
   // local /projects entries use the newer editorial layout.
   if (!local) {
     return (

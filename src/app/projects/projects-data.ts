@@ -192,7 +192,7 @@ export const localProjects: LocalProject[] = [
       "Supabase Auth",
     ],
     headline:
-      "A private income and expense tracker built around how people actually get paid — half-month periods, carried-over balances, and a live 50/30/20 budget guide.",
+      "A modern personal finance platform that helps users understand their spending habits through real-time analytics, intelligent budgeting, and personalized financial insights.",
     overview: [
       "Most budgeting apps assume a single monthly cycle, but plenty of people are paid twice a month and budget in halves. **Budget Tracker** models that directly: every month splits into a **1st half (days 1–15)** and a **2nd half (days 16–end)**, each with its own view and totals.",
       "It sets a **starting balance per month**, and the second half automatically carries over whatever is left from the first — so the running balance always reflects reality instead of resetting arbitrarily. Live summary cards and a totals bar keep income, expenses, and net visible while filtering.",

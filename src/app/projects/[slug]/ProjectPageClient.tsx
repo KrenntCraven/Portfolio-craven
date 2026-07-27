@@ -123,7 +123,7 @@ export default function ProjectPageClient({ project }: { project: Project }) {
               <div className="w-full space-y-5">
                 <motion.div variants={fadeUpItem}>
                   <Eyebrow>
-                    {projectTypes[0] ?? "Featured Project"}
+                    {projectTypes[0] ?? "Spotlight Project"}
                   </Eyebrow>
                 </motion.div>
 

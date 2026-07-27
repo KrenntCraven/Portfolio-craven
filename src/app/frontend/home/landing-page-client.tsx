@@ -91,7 +91,7 @@ export default function LandingPageClient() {
   };
 
   const scrollToProjects = () => {
-    const el = document.getElementById("projects");
+    const el = document.getElementById("spotlight");
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     smoothScrollTo(top);
@@ -101,7 +101,7 @@ export default function LandingPageClient() {
     const handleWheel = (event: WheelEvent) => {
       if (isSnappingRef.current) return;
 
-      const projectsSection = document.getElementById("projects");
+      const projectsSection = document.getElementById("spotlight");
       if (!projectsSection) return;
 
       const projectsTop =
@@ -216,7 +216,7 @@ export default function LandingPageClient() {
                   whileTap={{ scale: 0.98 }}
                   className={`group inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 sm:text-base ${FOCUS_RING}`}
                 >
-                  View Featured
+                  View Spotlight
                   <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
                 </motion.button>
 
@@ -353,7 +353,7 @@ export default function LandingPageClient() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 0.6 }}
-          aria-label="Scroll to projects"
+          aria-label="Scroll to spotlight projects"
           className={`absolute bottom-5 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-neutral-500 transition-colors hover:text-[#6c5ce7] sm:flex ${FOCUS_RING} rounded-lg`}
         >
           <span className="text-[11px] font-semibold uppercase tracking-[0.2em]">

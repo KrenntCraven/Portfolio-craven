@@ -7,7 +7,7 @@
  */
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { EASE } from "../../../frontend/project-ui";
+import { EASE } from "./project-ui";
 
 type RevealProps = {
   children: ReactNode;

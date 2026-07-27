@@ -54,7 +54,7 @@ async function buildEntityList(): Promise<string> {
   return value;
 }
 
-const SCOPE = `Krennt Craven's portfolio: his background, work experience, featured projects and case studies, technical skills, the technologies/tools he used in his projects or career, certifications, education, resume, contact/availability, and how this portfolio site was built.`;
+const SCOPE = `Krennt Craven's portfolio: his background, work experience, spotlight projects and case studies, technical skills, the technologies/tools he used in his projects or career, certifications, education, resume, contact/availability, and how this portfolio site was built.`;
 
 /**
  * Intent/relevance gate. Returns true only when the question is about Krennt's

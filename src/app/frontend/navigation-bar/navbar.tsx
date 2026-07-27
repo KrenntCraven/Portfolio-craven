@@ -22,7 +22,7 @@ import Logo from "../../Logo.svg";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/#projects", label: "Featured" },
+  { href: "/#spotlight", label: "Spotlight" },
   { href: "/projects", label: "Projects" },
   { href: "/about", label: "About" },
 ];
@@ -30,7 +30,7 @@ const navLinks = [
 export default function NavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<"home" | "featured">(
+  const [activeSection, setActiveSection] = useState<"home" | "spotlight">(
     "home",
   );
   const { open: openContactModal } = useContactModal();
@@ -60,13 +60,13 @@ export default function NavigationBar() {
     setIsScrolled(latest > 8);
 
     if (pathname === "/") {
-      const projects = document.getElementById("projects");
-      if (projects) {
-        const projectsTop =
-          projects.getBoundingClientRect().top + latest;
+      const spotlight = document.getElementById("spotlight");
+      if (spotlight) {
+        const spotlightTop =
+          spotlight.getBoundingClientRect().top + latest;
         setActiveSection(
-          latest >= projectsTop - window.innerHeight * 0.4
-            ? "featured"
+          latest >= spotlightTop - window.innerHeight * 0.4
+            ? "spotlight"
             : "home",
         );
       }
@@ -76,7 +76,7 @@ export default function NavigationBar() {
   const isActive = (href: string) => {
     if (pathname === "/") {
       if (href === "/") return activeSection === "home";
-      if (href === "/#projects") return activeSection === "featured";
+      if (href === "/#spotlight") return activeSection === "spotlight";
       return false;
     }
     if (href === "/about") return pathname.startsWith("/about");

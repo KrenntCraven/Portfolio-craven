@@ -1,6 +1,9 @@
+// `short` is the compact label used where space is tight (e.g. the homepage
+// cloud-proof strip); `title` remains the full name shown on the About page.
 export const certifications = [
   {
     title: "AWS Certified Solutions Architect – Associate",
+    short: "AWS Solutions Architect",
     issuer: "AWS",
     date: "2025",
     badge: "/badge/AWS Solution Architect Badge.png",
@@ -8,6 +11,7 @@ export const certifications = [
   },
   {
     title: "AWS Certified Developer – Associate",
+    short: "AWS Developer",
     issuer: "AWS",
     date: "2025",
     badge: "/badge/AWS Developer Badge.png",
@@ -16,6 +20,7 @@ export const certifications = [
 
   {
     title: "Google Cloud Certified – Associate Cloud Engineer",
+    short: "GCP Associate Cloud Engineer",
     issuer: "Google Cloud",
     date: "2025",
     badge: "/badge/Google Cloud Engineer Badge.png",
@@ -23,6 +28,7 @@ export const certifications = [
   },
   {
     title: "Microsoft Certified: Azure Fundamentals (AZ-900)",
+    short: "Azure Fundamentals",
     issuer: "Microsoft",
     date: "2025",
     badge: "/badge/AZ-900 Badge.png",
@@ -30,6 +36,7 @@ export const certifications = [
   },
   {
     title: "AWS Certified Cloud Practitioner (Foundational)",
+    short: "AWS Cloud Practitioner",
     issuer: "AWS",
     date: "2024",
     badge: "/badge/AWS Practioner Badge.png",
@@ -37,6 +44,7 @@ export const certifications = [
   },
   {
     title: "AWS Certified AI Practitioner (Foundational)",
+    short: "AWS AI Practitioner",
     issuer: "AWS",
     date: "2024",
     badge: "/badge/AI Practitioner Badge.png",

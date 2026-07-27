@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import LandingPage from "./frontend/home/landing-page";
+import CloudProof from "./frontend/home/cloud-proof";
 import FeaturedProjectsWrapper from "./backend/featured_projectsClient";
 
 function ProjectsFallback() {
@@ -29,7 +30,8 @@ export default function Home() {
   return (
     <>
       <LandingPage />
-      <div id="projects">
+      <CloudProof />
+      <div id="spotlight">
         <Suspense fallback={<ProjectsFallback />}>
           <FeaturedProjectsWrapper />
         </Suspense>

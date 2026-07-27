@@ -28,7 +28,7 @@ export default function ProjectsPageClient() {
       <div className="relative min-h-screen overflow-visible bg-white pb-24 text-neutral-900">
         <BannerBackground />
 
-        {/* Section background treatment — matches the home Featured surface */}
+        {/* Section background treatment — matches the home Spotlight surface */}
         <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
           <div className="absolute inset-0 bg-linear-to-b from-neutral-50/80 via-white/0 to-neutral-50/60" />
           <div
@@ -103,14 +103,14 @@ export default function ProjectsPageClient() {
           ) : (
             <div className="mt-16 text-center">
               <p className="text-base text-neutral-600">
-                New projects are on the way. In the meantime, explore featured
-                work on the home page.
+                New projects are on the way. In the meantime, explore the
+                spotlight work on the home page.
               </p>
               <Link
-                href="/#projects"
+                href="/#spotlight"
                 className={`mt-6 inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(0,0,0,0.55)] transition-colors hover:bg-neutral-800 ${FOCUS_RING}`}
               >
-                View featured work
+                View spotlight work
               </Link>
             </div>
           )}

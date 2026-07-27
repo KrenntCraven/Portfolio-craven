@@ -94,17 +94,16 @@ export default function FeaturedProjectsClient({
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-neutral-200 to-transparent" />
       </div>
 
-      <section
-        id="projects"
-        className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8 lg:pb-28 lg:pt-28"
-      >
+      {/* The #spotlight anchor lives on the wrapper in page.tsx so it also
+          exists while this section is still suspended. */}
+      <section className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8 lg:pb-28 lg:pt-28">
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mb-4 text-center text-4xl font-semibold text-neutral-800 sm:text-5xl lg:mb-6"
         >
-          Featured Projects
+          Spotlight
         </motion.h1>
 
         <motion.h2

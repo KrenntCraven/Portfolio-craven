@@ -10,7 +10,7 @@
 
 /** Canonical, on-brand refusal used both here and referenced by the persona. */
 export const CRAVUN_DECLINE =
-  "I'm designed specifically to answer questions about Krennt Craven — his experience, projects, technical skills, certifications, resume, and portfolio. I can't answer general or unrelated questions, but feel free to ask me about Krennt's work, technologies, career journey, or featured projects.";
+  "I'm designed specifically to answer questions about Krennt Craven — his experience, projects, technical skills, certifications, resume, and portfolio. I can't answer general or unrelated questions, but feel free to ask me about Krennt's work, technologies, career journey, or spotlight projects.";
 
 /**
  * Patterns that indicate an attempt to override Cravun's instructions, extract

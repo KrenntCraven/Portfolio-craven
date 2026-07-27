@@ -16,7 +16,7 @@ export const OG_SITE_NAME = "Krennt Craven";
 export const OG_LOCALE = "en_US";
 
 export const SITE_DESCRIPTION =
-  "Krennt Craven is a full-stack and cloud engineer building scalable, cloud-native systems — from frontend to backend to AWS infrastructure. Explore his experience, featured projects, and case studies.";
+  "Krennt Craven is a full-stack and cloud engineer building scalable, cloud-native systems — from frontend to backend to AWS infrastructure. Explore his experience, projects, and case studies.";
 
 export const AUTHOR_ROLES = [
   "Software Engineer",

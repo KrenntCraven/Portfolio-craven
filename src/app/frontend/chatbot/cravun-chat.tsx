@@ -1,11 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { EASE, FOCUS_RING } from "../project-ui";
 import { useKeyboardInset } from "../hooks/use-keyboard-inset";
+import { usePageTransition } from "../page-transition/page-transition";
+import { opensInNewTab } from "./cravun-links";
 
 interface CravunChatProps {
   isOpen: boolean;
@@ -100,8 +103,83 @@ function TypingDots() {
   );
 }
 
+/** Offset so a scrolled-to section clears the fixed navigation bar. */
+const SCROLL_OFFSET = 96;
+
+function scrollToElement(el: HTMLElement) {
+  window.scrollTo({
+    top: el.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET,
+    behavior: "smooth",
+  });
+}
+
+/**
+ * Scroll to a fragment once a client-side navigation has actually landed.
+ *
+ * Router-driven navigation doesn't reliably honour the fragment here: sections
+ * on the destination page are dynamically imported, so the target element often
+ * doesn't exist yet when the route changes. Wait for both the path and the
+ * element before scrolling, then give up rather than polling forever.
+ */
+function scrollToHashAfterNavigation(targetPath: string, hash: string) {
+  const deadline = performance.now() + 5000;
+  const tick = () => {
+    if (window.location.pathname === targetPath) {
+      const el = document.getElementById(hash);
+      if (el) {
+        scrollToElement(el);
+        return;
+      }
+    }
+    if (performance.now() < deadline) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 /** Renders Cravun's Markdown replies (bold, lists, links) inside a bubble. */
 function MarkdownMessage({ content }: { content: string }) {
+  const { startTransition } = usePageTransition();
+  const pathname = usePathname();
+
+  // Markdown renders plain anchors, and a plain in-site anchor triggers a full
+  // document load — which tears down the launcher (it lives in the root layout)
+  // and loses the conversation. Route in-site links through the same
+  // client-side navigation the navbar uses so the chat survives the jump.
+  const handleInSiteNav = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>, href?: string) => {
+      if (!href || !href.startsWith("/") || opensInNewTab(href)) return;
+      // Respect modified clicks (open in new tab/window) and non-primary buttons.
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const [path, hash] = href.split("#");
+      const targetPath = path || "/";
+
+      // Already on the destination page — just scroll, don't navigate.
+      if (hash && targetPath === pathname) {
+        const target = document.getElementById(hash);
+        if (target) {
+          event.preventDefault();
+          scrollToElement(target);
+          history.replaceState(null, "", href);
+          return;
+        }
+      }
+
+      event.preventDefault();
+      startTransition(href);
+      if (hash) scrollToHashAfterNavigation(targetPath, hash);
+    },
+    [pathname, startTransition],
+  );
+
   return (
     <div className="space-y-2">
       <ReactMarkdown
@@ -128,12 +206,13 @@ function MarkdownMessage({ content }: { content: string }) {
           ),
           li: ({ children }) => <li className="pl-0.5">{children}</li>,
           a: ({ href, children }) => {
-            const external = !!href && /^https?:\/\//.test(href);
+            const newTab = opensInNewTab(href);
             return (
               <a
                 href={href}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noopener noreferrer" : undefined}
+                target={newTab ? "_blank" : undefined}
+                rel={newTab ? "noopener noreferrer" : undefined}
+                onClick={(event) => handleInSiteNav(event, href)}
                 className="font-medium text-[#6c5ce7] underline underline-offset-2 hover:text-[#5a4bd4]"
               >
                 {children}

@@ -5,7 +5,7 @@
  */
 import type { ReactNode } from "react";
 import { Eyebrow } from "../../../frontend/project-ui";
-import { Reveal } from "./reveal";
+import { Reveal } from "../../../frontend/reveal";
 
 export function SectionShell({
   id,
