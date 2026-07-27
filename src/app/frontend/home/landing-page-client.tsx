@@ -73,12 +73,53 @@ function ChevronDown({ className }: { className?: string }) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Wheel snapping — hero → cloud → spotlight                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Snap targets in document order, below the hero (which sits at scroll 0).
+ * Add an id here whenever a new section lands between the hero and the
+ * spotlight grid, otherwise wheel users are carried straight past it.
+ */
+const SNAP_SECTION_IDS = ["cloud", "spotlight"];
+
+/** Slack around a boundary, so a section counts as reached just before it. */
+const SNAP_EDGE_TOLERANCE = 40;
+
+/** Absorbs trackpad momentum so one gesture cannot chain two snaps. */
+const SNAP_COOLDOWN_MS = 400;
+
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Document offsets of the hero top plus every snap section that exists. */
+function getSnapAnchors() {
+  const anchors = [0];
+  for (const id of SNAP_SECTION_IDS) {
+    const el = document.getElementById(id);
+    if (el) {
+      anchors.push(Math.round(el.getBoundingClientRect().top + window.scrollY));
+    }
+  }
+  return anchors;
+}
+
 export default function LandingPageClient() {
   const isSnappingRef = useRef(false);
+  const cooldownUntilRef = useRef(0);
   const { open: openContact } = useContactModal();
 
   const smoothScrollTo = (targetY: number) => {
     if (isSnappingRef.current) return;
+
+    if (prefersReducedMotion()) {
+      window.scrollTo(0, targetY);
+      cooldownUntilRef.current = Date.now() + SNAP_COOLDOWN_MS;
+      return;
+    }
+
     isSnappingRef.current = true;
     animate(window.scrollY, targetY, {
       duration: 0.8,
@@ -86,6 +127,7 @@ export default function LandingPageClient() {
       onUpdate: (latest) => window.scrollTo(0, latest),
       onComplete: () => {
         isSnappingRef.current = false;
+        cooldownUntilRef.current = Date.now() + SNAP_COOLDOWN_MS;
       },
     });
   };
@@ -99,25 +141,53 @@ export default function LandingPageClient() {
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
-      if (isSnappingRef.current) return;
+      // Hold the viewport still while a snap plays out, otherwise native
+      // scrolling fights the animation and overshoots the target.
+      if (isSnappingRef.current || Date.now() < cooldownUntilRef.current) {
+        event.preventDefault();
+        return;
+      }
 
-      const projectsSection = document.getElementById("spotlight");
-      if (!projectsSection) return;
+      // Pinch-zoom arrives as a ctrl-wheel; tiny deltas are a momentum tail.
+      if (event.ctrlKey || Math.abs(event.deltaY) < 4) return;
+      if (prefersReducedMotion()) return;
 
-      const projectsTop =
-        projectsSection.getBoundingClientRect().top + window.scrollY;
+      const anchors = getSnapAnchors();
+      if (anchors.length < 2) return;
+
       const currentY = window.scrollY;
-      const delta = event.deltaY;
+      const viewport = window.innerHeight;
 
-      if (delta > 0 && currentY < projectsTop - 40) {
-        event.preventDefault();
-        smoothScrollTo(projectsTop);
+      // The section the viewport currently starts in.
+      let index = 0;
+      while (
+        index + 1 < anchors.length &&
+        currentY >= anchors[index + 1] - SNAP_EDGE_TOLERANCE
+      ) {
+        index += 1;
       }
 
-      if (delta < 0 && currentY >= projectsTop - 40) {
+      if (event.deltaY > 0) {
+        // Below the last anchor the page scrolls normally.
+        if (index + 1 >= anchors.length) return;
+
+        // A section taller than the viewport is read through first, so its
+        // lower half can never be snapped over.
+        const next = anchors[index + 1];
+        if (currentY + viewport < next - SNAP_EDGE_TOLERANCE) return;
+
         event.preventDefault();
-        smoothScrollTo(0);
+        smoothScrollTo(next);
+        return;
       }
+
+      if (index === 0) return;
+
+      // Scrolling up mid-section reads back through it instead of snapping.
+      if (currentY > anchors[index] + SNAP_EDGE_TOLERANCE) return;
+
+      event.preventDefault();
+      smoothScrollTo(anchors[index - 1]);
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });

@@ -10,6 +10,7 @@
  *  5. About page – resize debounce adds / removes listener
  *  6. LandingPageClient – wheel listener registered with { passive: false }
  *  7. LandingPageClient – wheel listener cleaned up on unmount
+ *  8. LandingPageClient – wheel snap chain never skips a section
  */
 
 import React from "react";
@@ -152,6 +153,7 @@ jest.mock("@heroui/button", () => ({
 // Static imports (must come after jest.mock declarations)
 // ---------------------------------------------------------------------------
 
+import { animate } from "framer-motion";
 import { BannerBackground } from "@/app/frontend/banner-background";
 import {
   PageTransitionProvider,
@@ -356,5 +358,99 @@ describe("LandingPageClient – wheel scroll performance guards", () => {
     await act(async () => { unmount(); });
     expect(removeSpy.mock.calls.map(([e]) => e)).toContain("wheel");
     removeSpy.mockRestore();
+  });
+});
+
+// ===========================================================================
+// 8 — LandingPageClient – wheel snap chain (hero → cloud → spotlight)
+// ===========================================================================
+// Geometry measured on a real 1440x900 render: the cloud section sits between
+// the hero and the spotlight grid and is TALLER than the viewport. A snap that
+// only knows about the spotlight grid flies straight past it in both
+// directions, which is the regression these tests guard.
+
+const CLOUD_TOP = 820;
+const SPOTLIGHT_TOP = 1829;
+const VIEWPORT = 900;
+const PAGE_BOTTOM = 2831;
+
+function setScrollY(y: number) {
+  Object.defineProperty(window, "scrollY", { configurable: true, value: y });
+}
+
+function mountSnapSections() {
+  for (const [id, top] of [
+    ["cloud", CLOUD_TOP],
+    ["spotlight", SPOTLIGHT_TOP],
+  ] as const) {
+    const el = document.createElement("div");
+    el.id = id;
+    el.getBoundingClientRect = () =>
+      ({ top: top - window.scrollY }) as unknown as DOMRect;
+    document.body.appendChild(el);
+  }
+}
+
+function wheel(deltaY: number) {
+  const event = new WheelEvent("wheel", { deltaY, cancelable: true });
+  window.dispatchEvent(event);
+  return event;
+}
+
+describe("LandingPageClient – wheel snap chain", () => {
+  beforeEach(() => {
+    _reducedMotion = false;
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: VIEWPORT,
+    });
+    (animate as jest.Mock).mockClear();
+    mountSnapSections();
+  });
+
+  afterEach(() => {
+    document.getElementById("cloud")?.remove();
+    document.getElementById("spotlight")?.remove();
+    setScrollY(0);
+  });
+
+  /** Destination of the most recent snap animation. */
+  const snapTarget = () => (animate as jest.Mock).mock.calls.at(-1)?.[1];
+
+  it("snaps the hero to the section directly below it, not past it", async () => {
+    setScrollY(0);
+    await act(async () => { render(<LandingHero />); });
+    await act(async () => { wheel(120); });
+    expect(snapTarget()).toBe(CLOUD_TOP);
+  });
+
+  it("lets a section taller than the viewport scroll before snapping on", async () => {
+    setScrollY(CLOUD_TOP);
+    await act(async () => { render(<LandingHero />); });
+    const event = wheel(120);
+    expect(animate).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("snaps onward once the end of the current section is in view", async () => {
+    setScrollY(SPOTLIGHT_TOP - VIEWPORT);
+    await act(async () => { render(<LandingHero />); });
+    await act(async () => { wheel(120); });
+    expect(snapTarget()).toBe(SPOTLIGHT_TOP);
+  });
+
+  it("does not yank to the top when scrolling up from deep in the page", async () => {
+    setScrollY(PAGE_BOTTOM);
+    await act(async () => { render(<LandingHero />); });
+    const event = wheel(-120);
+    expect(animate).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("snaps up into the cloud section from the top of the spotlight grid", async () => {
+    setScrollY(SPOTLIGHT_TOP);
+    await act(async () => { render(<LandingHero />); });
+    await act(async () => { wheel(-120); });
+    expect(snapTarget()).toBe(CLOUD_TOP);
   });
 });
