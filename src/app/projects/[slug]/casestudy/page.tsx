@@ -12,6 +12,11 @@ import CaseStudyPageClient from "./CaseStudyPageClient";
 
 export const revalidate = 3600;
 
+// Only projects that actually have case-study content are generated below;
+// closing the route keeps every other slug a real 404 instead of an empty
+// 200 shell. See the note in ../page.tsx.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const projects = await getFeaturedProjects();
   return projects

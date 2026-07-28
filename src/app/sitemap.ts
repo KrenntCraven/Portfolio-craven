@@ -3,25 +3,27 @@ import { getFeaturedProjects } from "./backend/contentful_init";
 import { localProjects } from "./projects/projects-data";
 import { SITE_URL } from "./seo";
 
+/**
+ * `lastModified` is deliberately omitted. We have no real per-page edit dates,
+ * and stamping every URL with the build time tells Google the whole site
+ * changes on each deploy — a signal it learns to distrust and then ignores for
+ * the entire sitemap. Better to say nothing than to say something false.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${SITE_URL}/`,
-      lastModified: now,
+      // No trailing slash, to match the canonical tag the page actually renders.
+      url: SITE_URL,
       changeFrequency: "monthly",
       priority: 1.0,
     },
     {
       url: `${SITE_URL}/about`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/projects`,
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
     },
@@ -31,7 +33,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const localProjectRoutes: MetadataRoute.Sitemap = localProjects.map(
     (project) => ({
       url: `${SITE_URL}/projects/${project.slug}`,
-      lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.9,
     }),
@@ -45,7 +46,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const routes: MetadataRoute.Sitemap = [
         {
           url: `${SITE_URL}/projects/${project.slug}`,
-          lastModified: now,
           changeFrequency: "monthly" as const,
           priority: 0.9,
         },
@@ -54,7 +54,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (project.caseStudy) {
         routes.push({
           url: `${SITE_URL}/projects/${project.slug}/casestudy`,
-          lastModified: now,
           changeFrequency: "monthly" as const,
           priority: 0.7,
         });

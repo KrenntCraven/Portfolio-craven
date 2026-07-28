@@ -29,6 +29,12 @@ import { TechnologyStack } from "./components/technology-stack";
 
 export const revalidate = 3600;
 
+// Every valid slug is known at build time, so anything else is a genuine 404.
+// Without this, Next streams the layout shell before `notFound()` resolves and
+// the response goes out as 200 — a soft 404 that Google indexes as a duplicate
+// of the homepage, since the fallback metadata is the root metadata.
+export const dynamicParams = false;
+
 // Local (hardcoded) projects take precedence over Contentful for the same slug.
 async function resolveProject(slug: string): Promise<Project | null> {
   const local = getLocalProject(slug);
