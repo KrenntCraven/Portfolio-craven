@@ -17,6 +17,8 @@ interface ProjectEntryFields {
   title: EntryFieldTypes.Text;
   slug: EntryFieldTypes.Text;
   headline?: EntryFieldTypes.Text;
+  /** Long text, or a list of paragraphs — see `toParagraphs`. */
+  overview?: EntryFieldTypes.Text;
   heroImage?: EntryFieldTypes.AssetLink;
   coverPage?: EntryFieldTypes.AssetLink;
   projectType?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
@@ -69,6 +71,22 @@ function toList(value: unknown): string[] {
   return arr.map((v) => String(v).trim()).filter(Boolean);
 }
 
+// Overview accepts either a short-text list (one entry per paragraph) or a
+// long-text field with blank lines between paragraphs, so the content type can
+// be modelled either way without a code change.
+function toParagraphs(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((v) => String(v).trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
 async function _getFeaturedProjects(): Promise<Project[]> {
   const entries = await client.getEntries<ProjectEntrySkeleton>({
     content_type: PROJECT_TYPE,
@@ -81,6 +99,7 @@ async function _getFeaturedProjects(): Promise<Project[]> {
       title: item.fields.title ?? "Untitled",
       slug: item.fields.slug ?? "",
       headline: item.fields.headline,
+      overview: toParagraphs(item.fields.overview),
       imageUrl:
         item.fields.heroImage &&
         isAsset(item.fields.heroImage) &&
@@ -132,6 +151,7 @@ async function _getProjectBySlug(slug: string): Promise<Project | null> {
     title: item.fields.title ?? "Untitled",
     slug: item.fields.slug ?? "",
     headline: item.fields.headline,
+    overview: toParagraphs(item.fields.overview),
     imageUrl:
       item.fields.heroImage &&
       isAsset(item.fields.heroImage) &&

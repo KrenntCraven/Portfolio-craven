@@ -20,6 +20,7 @@ import { MotionConfig, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Project } from "../../backend/types";
+import { MetricCards } from "./components/quick-metrics";
 
 /** Inline **bold** markdown → <strong> for plain-text Contentful fields. */
 const parseBold = (text: string) => {
@@ -80,9 +81,17 @@ export default function ProjectPageClient({ project }: { project: Project }) {
       ? [project.keyFeatures]
       : [];
 
+  const overview = project.overview ?? [];
+  const impactStats = project.impactStats ?? [];
+
   const hasLinks = Boolean(
     project.githubLink || project.caseStudy || project.siteLink,
   );
+  const hasBody =
+    overview.length > 0 ||
+    keyFeatures.length > 0 ||
+    technologies.length > 0 ||
+    impactStats.length > 0;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -289,9 +298,42 @@ export default function ProjectPageClient({ project }: { project: Project }) {
         {/* ---------------------------------------------------------- */}
         {/* Body sections                                              */}
         {/* ---------------------------------------------------------- */}
-        {(keyFeatures.length > 0 || technologies.length > 0) && (
+        {hasBody && (
           <main className="relative z-10 mx-auto max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
             <div className="mx-auto h-px max-w-6xl bg-linear-to-r from-transparent via-neutral-200 to-transparent" />
+
+            {/* Overview — the editorial lead. Deliberately reads only the
+                `overview` field and never falls back to the case-study intro,
+                which would republish that text on two URLs. */}
+            {overview.length > 0 && (
+              <motion.section
+                {...inViewProps}
+                variants={sectionReveal}
+                aria-labelledby="overview-heading"
+                className="pt-12 sm:pt-16"
+              >
+                <div className="mb-6 space-y-3">
+                  <Eyebrow>Overview</Eyebrow>
+                  <h2
+                    id="overview-heading"
+                    className="text-2xl font-bold tracking-tight text-neutral-800 sm:text-3xl"
+                  >
+                    About this project
+                  </h2>
+                </div>
+                <div className="max-w-3xl space-y-5">
+                  {overview.map((paragraph, index) => (
+                    <motion.p
+                      key={index}
+                      variants={fadeUpItem}
+                      className="text-base leading-relaxed text-neutral-600 sm:text-lg"
+                    >
+                      {parseBold(paragraph)}
+                    </motion.p>
+                  ))}
+                </div>
+              </motion.section>
+            )}
 
             {/* Key Features */}
             {keyFeatures.length > 0 && (
@@ -359,6 +401,27 @@ export default function ProjectPageClient({ project }: { project: Project }) {
                     </motion.span>
                   ))}
                 </div>
+              </motion.section>
+            )}
+
+            {/* Quick metrics */}
+            {impactStats.length > 0 && (
+              <motion.section
+                {...inViewProps}
+                variants={sectionReveal}
+                aria-labelledby="metrics-heading"
+                className="pb-12 sm:pb-16"
+              >
+                <div className="mb-6 space-y-3">
+                  <Eyebrow>By the numbers</Eyebrow>
+                  <h2
+                    id="metrics-heading"
+                    className="text-2xl font-bold tracking-tight text-neutral-800 sm:text-3xl"
+                  >
+                    Quick metrics
+                  </h2>
+                </div>
+                <MetricCards stats={impactStats} />
               </motion.section>
             )}
           </main>
