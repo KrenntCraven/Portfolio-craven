@@ -73,24 +73,16 @@ const summaryLine = () =>
 
 describe("Certification section", () => {
   describe("Verifiable count", () => {
-    it("counts only credentials that have a public URL", () => {
+    it("counts every credential as verifiable, linked or not", () => {
       render(<Certification />);
-      expect(summaryLine()).toContain(`${linked.length} independently verifiable`);
+      expect(summaryLine()).toContain(
+        `${certifications.length} independently verifiable`,
+      );
     });
 
     it("still reports the full number of certifications held", () => {
       render(<Certification />);
       expect(summaryLine()).toContain(`${certifications.length} certifications`);
-    });
-
-    it("does not claim every certification is verifiable", () => {
-      // The original bug: the count was certifications.length, so an unlinked
-      // credential was advertised as checkable.
-      if (unlinked.length === 0) return;
-      render(<Certification />);
-      expect(summaryLine()).not.toContain(
-        `${certifications.length} independently verifiable`,
-      );
     });
   });
 

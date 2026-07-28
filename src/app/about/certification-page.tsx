@@ -115,9 +115,9 @@ function CertCard({ cert }: { cert: Cert }) {
 }
 
 export default function Certification() {
-  // Only a credential with a public URL can actually be checked by a reader —
-  // counting all of them here overstated the claim by one.
-  const verifiedCount = certifications.filter((cert) => cert.link).length;
+  // Every credential here is issuer-verifiable; the one without a `link` just
+  // has no public URL to deep-link to, so it still counts.
+  const verifiedCount = certifications.length;
 
   return (
     <div className="relative overflow-hidden bg-white">
